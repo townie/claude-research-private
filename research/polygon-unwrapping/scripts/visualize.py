@@ -16,9 +16,9 @@ import numpy as np
 from typing import List, Set, Dict, Optional, Tuple
 import colorsys
 
-from utils.mesh import Mesh
-from utils.dual_graph import DualGraph
-from utils.quality_metrics import generate_quality_report, format_quality_report
+from scripts.utils.mesh import Mesh
+from scripts.utils.dual_graph import DualGraph
+from scripts.utils.quality_metrics import generate_quality_report, format_quality_report
 
 
 def generate_cluster_colors(n_clusters: int) -> List[Tuple[float, float, float]]:

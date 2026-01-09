@@ -13,11 +13,8 @@ from typing import List, Set, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 import numpy as np
 
-import sys
-sys.path.insert(0, '..')
-
-from ..utils.mesh import Mesh
-from ..utils.dual_graph import DualGraph
+from scripts.utils.mesh import Mesh
+from scripts.utils.dual_graph import DualGraph
 
 
 @dataclass

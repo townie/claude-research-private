@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UV Visualization Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        #viewport-3d {
+            flex: 1;
+            position: relative;
+            background: #16213e;
+        }
+        #sidebar {
+            width: 400px;
+            background: #0f0f23;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .controls {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .controls h2 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #1a1a2e;
+            color: #eee;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        select:hover, button:hover {
+            border-color: #3498db;
+        }
+        button {
+            background: #3498db;
+            border-color: #3498db;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:disabled {
+            background: #333;
+            border-color: #333;
+            cursor: not-allowed;
+        }
+        button.secondary {
+            background: transparent;
+            border-color: #555;
+        }
+        button.secondary:hover {
+            background: #333;
+        }
+        .status {
+            padding: 10px 15px;
+            background: #1a1a2e;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .status .info {
+            color: #3498db;
+        }
+        #uv-panels {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .uv-panel {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .uv-panel:hover {
+            border-color: #3498db;
+        }
+        .uv-panel.selected {
+            border-color: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+        }
+        .uv-panel-header {
+            padding: 8px 12px;
+            background: #0f0f23;
+            font-size: 12px;
+            color: #95a5a6;
+            display: flex;
+            justify-content: space-between;
+        }
+        .uv-panel svg {
+            width: 100%;
+            height: 150px;
+            background: #16213e;
+        }
+        .uv-panel svg polygon {
+            stroke: #333;
+            stroke-width: 0.5;
+            cursor: pointer;
+            transition: fill-opacity 0.2s;
+        }
+        .uv-panel svg polygon:hover {
+            stroke: #fff;
+            stroke-width: 1;
+        }
+        .uv-panel svg polygon.highlighted {
+            stroke: #e74c3c;
+            stroke-width: 2;
+            fill-opacity: 0.8 !important;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Print Preview Modal */
+        #print-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .print-preview-container {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 95vw;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .print-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .print-preview-header h2 {
+            margin: 0;
+            color: #fff;
+        }
+        .print-preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .print-preview-actions button {
+            width: auto;
+            padding: 8px 16px;
+        }
+        .print-preview-body {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .page-canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a15;
+            border-radius: 4px;
+            padding: 20px;
+            overflow: auto;
+        }
+        #page-canvas {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .draggable-cluster {
+            position: absolute;
+            cursor: move;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .draggable-cluster:hover {
+            border-color: #3498db;
+        }
+        .draggable-cluster.dragging {
+            opacity: 0.8;
+            border-color: #e74c3c;
+            z-index: 100;
+        }
+        .draggable-cluster svg {
+            display: block;
+        }
+        .cluster-label {
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #333;
+            white-space: nowrap;
+        }
+        .cluster-palette {
+            width: 200px;
+            background: #0f0f23;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .cluster-palette h3 {
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        .palette-item {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .palette-item:hover {
+            border-color: #3498db;
+        }
+        .palette-item .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        .palette-item span {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .page-info {
+            text-align: center;
+            color: #666;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        /* Assembly Simulation Modal */
+        #assembly-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .assembly-container {
+            background: #1a1a2e;
+            border-radius: 8px;
+            width: 95vw;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .assembly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #0f0f23;
+            border-bottom: 1px solid #333;
+        }
+        .assembly-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 18px;
+        }
+        .assembly-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .assembly-controls button {
+            width: auto;
+            padding: 8px 16px;
+        }
+        .assembly-controls select {
+            width: auto;
+            padding: 6px 12px;
+        }
+        .assembly-controls input[type="range"] {
+            cursor: pointer;
+        }
+        #assembly-progress-text {
+            min-width: 40px;
+            text-align: right;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+        .assembly-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        #assembly-viewport {
+            flex: 1;
+            background: #16213e;
+            position: relative;
+        }
+        #assembly-viewport canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .assembly-info {
+            width: 200px;
+            background: #0f0f23;
+            padding: 15px;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .assembly-info h3 {
+            margin: 0;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        #assembly-status {
+            font-size: 13px;
+            color: #95a5a6;
+            line-height: 1.5;
+        }
+        .assembly-legend {
+            font-size: 12px;
+            color: #777;
+        }
+        .assembly-legend div {
+            margin-bottom: 6px;
+        }
+        /* Hover Tooltip */
+        #hover-tooltip {
+            position: fixed;
+            background: rgba(15, 15, 35, 0.95);
+            border: 1px solid #3498db;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #eee;
+            pointer-events: none;
+            z-index: 2000;
+            display: none;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        #hover-tooltip h4 {
+            margin: 0 0 8px 0;
+            color: #3498db;
+            font-size: 13px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+        }
+        #hover-tooltip .metric {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        #hover-tooltip .label {
+            color: #888;
+        }
+        #hover-tooltip .value {
+            color: #fff;
+            font-weight: 500;
+        }
+        /* Enhanced highlight animation for UV panels */
+        .uv-panel svg polygon.highlighted {
+            stroke: #e74c3c !important;
+            stroke-width: 2.5px !important;
+            fill-opacity: 0.8 !important;
+            animation: pulse-highlight 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes pulse-highlight {
+            from { stroke-width: 2px; filter: drop-shadow(0 0 2px #e74c3c); }
+            to { stroke-width: 3px; filter: drop-shadow(0 0 6px #e74c3c); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="viewport-3d">
+            <div id="loading">
+                <div class="spinner"></div>
+                <div>Loading Three.js...</div>
+            </div>
+        </div>
+        <div id="sidebar">
+            <div class="controls">
+                <h2>Mesh</h2>
+                <div class="control-group">
+                    <label>Load Mesh</label>
+                    <select id="mesh-select">
+                        <option value="">-- Select Mesh --</option>
+                        <option value="cube">Cube</option>
+                        <option value="pyramid">Pyramid</option>
+                        <option value="cylinder">Cylinder</option>
+                        <option value="dog">Dog</option>
+                        <option value="dog_detailed">Dog (Detailed)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Or Upload File</label>
+                    <input type="file" id="file-upload" accept=".obj,.stl" style="display:none">
+                    <button class="secondary" onclick="document.getElementById('file-upload').click()">
+                        Upload OBJ/STL
+                    </button>
+                </div>
+            </div>
+            <div class="controls">
+                <h2>Clustering</h2>
+                <div class="control-group">
+                    <label>Algorithm</label>
+                    <select id="algorithm-select">
+                        <option value="msf">Maximum Spanning Forest</option>
+                        <option value="greedy">Greedy Region Growing</option>
+                        <option value="hierarchical">Hierarchical</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button id="cluster-btn" disabled>Run Clustering</button>
+                </div>
+            </div>
+            <div class="controls">
+                <h2>UV Flattening</h2>
+                <div class="control-group">
+                    <label>Method</label>
+                    <select id="flatten-select">
+                        <option value="conformal">Conformal (Angle-preserving)</option>
+                        <option value="planar">Planar Projection</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button id="flatten-btn" disabled>Flatten to 2D</button>
+                </div>
+                <div class="control-group">
+                    <button id="export-btn" class="secondary" disabled>Export Print SVG</button>
+                </div>
+                <div class="control-group">
+                    <button id="export-pdf-btn" class="secondary" disabled>Export Print PDF</button>
+                </div>
+                <div class="control-group">
+                    <button id="print-preview-btn" disabled>Print Preview</button>
+                </div>
+                <div class="control-group">
+                    <button id="assembly-sim-btn" disabled>Assembly Simulation</button>
+                </div>
+            </div>
+            <div class="status">
+                <span id="status-text">No mesh loaded</span>
+            </div>
+            <div id="uv-panels">
+                <p style="color: #555; text-align: center; padding: 40px;">
+                    Load a mesh and run clustering to see UV panels
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div id="hover-tooltip">
+        <h4>Cluster <span id="tooltip-cluster-id">0</span></h4>
+        <div class="metric">
+            <span class="label">Faces:</span>
+            <span class="value" id="tooltip-faces">0</span>
+        </div>
+        <div class="metric">
+            <span class="label">Surface Area:</span>
+            <span class="value" id="tooltip-area">0 sq units</span>
+        </div>
+        <div class="metric">
+            <span class="label">3D Size:</span>
+            <span class="value" id="tooltip-size">0 × 0 units</span>
+        </div>
+    </div>
+
+    <!-- Assembly Simulation Modal -->
+    <div id="assembly-modal" class="hidden">
+        <div class="assembly-container">
+            <div class="assembly-header">
+                <h2>Assembly Simulation</h2>
+                <div class="assembly-controls">
+                    <button id="assembly-reset-btn" class="secondary" title="Reset">⟲ Reset</button>
+                    <button id="assembly-play-btn" title="Play/Pause">▶ Play</button>
+                    <select id="assembly-speed-select">
+                        <option value="0.5">0.5x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="2">2x</option>
+                        <option value="4">4x</option>
+                    </select>
+                    <input type="range" id="assembly-progress" min="0" max="100" value="0" style="width: 200px;">
+                    <span id="assembly-progress-text">0%</span>
+                    <button id="close-assembly-btn" class="secondary">Close</button>
+                </div>
+            </div>
+            <div class="assembly-body">
+                <div id="assembly-viewport"></div>
+                <div class="assembly-info">
+                    <h3>Assembly Info</h3>
+                    <div id="assembly-status">Ready to simulate</div>
+                    <div class="assembly-legend">
+                        <div><span style="color: #3498db;">●</span> Flat position</div>
+                        <div><span style="color: #2ecc71;">●</span> Assembled position</div>
+                        <div><span style="color: #e74c3c;">—</span> Seam edges</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Preview Modal -->
+    <div id="print-preview-modal" class="hidden">
+        <div class="print-preview-container">
+            <div class="print-preview-header">
+                <h2>Print Preview - Letter (8.5" × 11")</h2>
+                <div class="print-preview-actions">
+                    <button id="auto-arrange-btn" class="secondary">Auto Arrange</button>
+                    <button id="preview-export-pdf-btn">Export PDF</button>
+                    <button id="close-preview-btn" class="secondary">Close</button>
+                </div>
+            </div>
+            <div class="print-preview-body">
+                <div class="page-canvas-container">
+                    <div>
+                        <div id="page-canvas"></div>
+                        <div class="page-info">Drag clusters to reposition. Letter paper: 8.5" × 11" (72 DPI preview)</div>
+                    </div>
+                </div>
+                <div class="cluster-palette">
+                    <h3>Clusters</h3>
+                    <div id="palette-items"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // State
+        const state = {
+            mesh: null,
+            clusters: [],
+            hoveredFaceId: null,
+            selectedClusterId: null,
+        };
+
+        // Three.js setup
+        let scene, camera, renderer, controls, meshObject;
+        let faceIdToCluster = {};
+        let clusterColors = [];
+
+        function initThree() {
+            const container = document.getElementById('viewport-3d');
+            const loading = document.getElementById('loading');
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x16213e);
+
+            camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(3, 3, 3);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambient);
+            const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+            directional.position.set(5, 10, 7);
+            scene.add(directional);
+
+            // Grid helper
+            const grid = new THREE.GridHelper(10, 10, 0x333333, 0x222222);
+            scene.add(grid);
+
+            loading.classList.add('hidden');
+
+            // Raycasting for face selection
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('mousemove', (event) => {
+                if (!meshObject) return;
+
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(meshObject);
+
+                if (intersects.length > 0) {
+                    const faceIndex = intersects[0].faceIndex;
+                    const faceId = meshObject.geometry.getAttribute('faceId');
+                    if (faceId) {
+                        const id = faceId.getX(faceIndex * 3);
+                        setHoveredFace(id, event.clientX, event.clientY);
+                    }
+                } else {
+                    setHoveredFace(null, event.clientX, event.clientY);
+                }
+            });
+
+            renderer.domElement.addEventListener('click', () => {
+                if (state.hoveredFaceId !== null) {
+                    const clusterId = faceIdToCluster[state.hoveredFaceId];
+                    setSelectedCluster(clusterId);
+                }
+            });
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function setHoveredFace(faceId, mouseX, mouseY) {
+            if (state.hoveredFaceId === faceId) return;
+            state.hoveredFaceId = faceId;
+            updateHighlights();
+
+            // Show/hide tooltip with cluster metrics
+            if (faceId !== null && faceIdToCluster[faceId] !== undefined) {
+                const clusterId = faceIdToCluster[faceId];
+                const cluster = state.clusters[clusterId];
+                if (cluster) {
+                    showTooltip(cluster, mouseX, mouseY);
+                }
+            } else {
+                hideTooltip();
+            }
+        }
+
+        function showTooltip(cluster, x, y) {
+            const tooltip = document.getElementById('hover-tooltip');
+            const metrics = cluster.metrics || {};
+            const bbox = cluster.bbox || {};
+
+            // UV dimensions are now in 3D units (1:1 scale)
+            const width3D = bbox.max ? (bbox.max[0] - bbox.min[0]) : (metrics.physical_width || 0);
+            const height3D = bbox.max ? (bbox.max[1] - bbox.min[1]) : (metrics.physical_height || 0);
+
+            document.getElementById('tooltip-cluster-id').textContent = cluster.id;
+            document.getElementById('tooltip-faces').textContent = metrics.face_count || cluster.face_ids?.length || 0;
+            document.getElementById('tooltip-area').textContent = (metrics.surface_area_3d || 0).toFixed(3) + ' sq units';
+            document.getElementById('tooltip-size').textContent = `${width3D.toFixed(3)} × ${height3D.toFixed(3)} units`;
+
+            // Position tooltip near cursor, but keep on screen
+            const tooltipWidth = 200;
+            const tooltipHeight = 140;
+            let posX = x + 15;
+            let posY = y + 15;
+
+            // Keep tooltip on screen
+            if (posX + tooltipWidth > window.innerWidth) {
+                posX = x - tooltipWidth - 15;
+            }
+            if (posY + tooltipHeight > window.innerHeight) {
+                posY = y - tooltipHeight - 15;
+            }
+
+            tooltip.style.left = posX + 'px';
+            tooltip.style.top = posY + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hideTooltip() {
+            document.getElementById('hover-tooltip').style.display = 'none';
+        }
+
+        function setSelectedCluster(clusterId) {
+            state.selectedClusterId = clusterId;
+            updateHighlights();
+
+            // Highlight UV panel
+            document.querySelectorAll('.uv-panel').forEach(panel => {
+                panel.classList.toggle('selected', panel.dataset.cluster == clusterId);
+            });
+        }
+
+        function updateHighlights() {
+            if (!meshObject) return;
+
+            const colors = meshObject.geometry.getAttribute('color');
+            const faceIds = meshObject.geometry.getAttribute('faceId');
+
+            for (let i = 0; i < colors.count; i += 3) {
+                const faceId = faceIds.getX(i);
+                const clusterId = faceIdToCluster[faceId];
+                const baseColor = clusterColors[clusterId] || new THREE.Color(0x888888);
+
+                let color = baseColor.clone();
+
+                // Highlight hovered face
+                if (faceId === state.hoveredFaceId) {
+                    color = new THREE.Color(0xffff00);
+                }
+                // Highlight selected cluster
+                else if (clusterId === state.selectedClusterId) {
+                    color = baseColor.clone().multiplyScalar(1.3);
+                }
+
+                colors.setXYZ(i, color.r, color.g, color.b);
+                colors.setXYZ(i + 1, color.r, color.g, color.b);
+                colors.setXYZ(i + 2, color.r, color.g, color.b);
+            }
+            colors.needsUpdate = true;
+
+            // Update UV panels
+            document.querySelectorAll('.uv-panel svg polygon').forEach(poly => {
+                const id = parseInt(poly.dataset.face);
+                poly.classList.toggle('highlighted', id === state.hoveredFaceId);
+            });
+        }
+
+        function loadMeshData(data) {
+            // Remove old mesh
+            if (meshObject) {
+                scene.remove(meshObject);
+                meshObject.geometry.dispose();
+                meshObject.material.dispose();
+            }
+
+            const { mesh, clusters } = data;
+            state.mesh = mesh;
+            state.clusters = clusters;
+
+            // Build face -> cluster mapping
+            faceIdToCluster = {};
+            clusterColors = [];
+            clusters.forEach((cluster, idx) => {
+                const color = new THREE.Color(cluster.color);
+                clusterColors[idx] = color;
+                cluster.face_ids.forEach(fid => {
+                    faceIdToCluster[fid] = idx;
+                });
+            });
+
+            // Create geometry
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            const faceIds = [];
+            const normals = [];
+
+            mesh.faces.forEach((face, idx) => {
+                const faceId = mesh.face_ids[idx];
+                const clusterId = faceIdToCluster[faceId];
+                const color = clusterColors[clusterId] || new THREE.Color(0x888888);
+                const normal = mesh.normals[idx];
+
+                // Triangulate face (assuming triangles or quads)
+                for (let i = 1; i < face.length - 1; i++) {
+                    const v0 = mesh.vertices[face[0]];
+                    const v1 = mesh.vertices[face[i]];
+                    const v2 = mesh.vertices[face[i + 1]];
+
+                    positions.push(...v0, ...v1, ...v2);
+                    colors.push(color.r, color.g, color.b);
+                    colors.push(color.r, color.g, color.b);
+                    colors.push(color.r, color.g, color.b);
+                    faceIds.push(faceId, faceId, faceId);
+                    normals.push(...normal, ...normal, ...normal);
+                }
+            });
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setAttribute('faceId', new THREE.Int32BufferAttribute(faceIds, 1));
+            geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+
+            const material = new THREE.MeshLambertMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+            });
+
+            meshObject = new THREE.Mesh(geometry, material);
+            scene.add(meshObject);
+
+            // Center camera on mesh
+            const box = new THREE.Box3().setFromObject(meshObject);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+
+            camera.position.set(center.x + maxDim * 1.5, center.y + maxDim, center.z + maxDim * 1.5);
+            controls.target.copy(center);
+            controls.update();
+
+            // Render UV panels
+            renderUVPanels(clusters);
+        }
+
+        function renderUVPanels(clusters) {
+            const container = document.getElementById('uv-panels');
+            container.innerHTML = '';
+
+            clusters.forEach((cluster, idx) => {
+                if (!cluster.uv_vertices) return;
+
+                const panel = document.createElement('div');
+                panel.className = 'uv-panel';
+                panel.dataset.cluster = idx;
+
+                panel.innerHTML = `
+                    <div class="uv-panel-header">
+                        <span>Cluster ${idx}</span>
+                        <span>${cluster.face_ids.length} faces</span>
+                    </div>
+                `;
+
+                // Get bbox for normalizing UV coords (now in 3D units, not 0-1)
+                const bbox = cluster.bbox;
+                const bboxMinX = bbox ? bbox.min[0] : 0;
+                const bboxMinY = bbox ? bbox.min[1] : 0;
+                const bboxW = bbox ? (bbox.max[0] - bbox.min[0]) : 1;
+                const bboxH = bbox ? (bbox.max[1] - bbox.min[1]) : 1;
+
+                // Helper function to normalize UV coords to 0-100 SVG viewBox
+                function uvToSvg(uvX, uvY) {
+                    const normX = bboxW > 0 ? (uvX - bboxMinX) / bboxW : 0;
+                    const normY = bboxH > 0 ? (uvY - bboxMinY) / bboxH : 0;
+                    return {
+                        x: normX * 90 + 5,
+                        y: (1 - normY) * 90 + 5
+                    };
+                }
+
+                // Create SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+                // Draw faces
+                cluster.uv_faces.forEach((face, faceIdx) => {
+                    const points = face.map(localIdx => {
+                        const uv = cluster.uv_vertices[localIdx];
+                        const svgCoord = uvToSvg(uv[0], uv[1]);
+                        return `${svgCoord.x},${svgCoord.y}`;
+                    }).join(' ');
+
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points);
+                    polygon.setAttribute('fill', cluster.color);
+                    polygon.setAttribute('fill-opacity', '0.5');
+                    polygon.dataset.face = cluster.face_ids[faceIdx];
+
+                    polygon.addEventListener('mouseenter', (e) => {
+                        setHoveredFace(cluster.face_ids[faceIdx], e.clientX, e.clientY);
+                    });
+                    polygon.addEventListener('mousemove', (e) => {
+                        // Update tooltip position as mouse moves within polygon
+                        if (state.hoveredFaceId === cluster.face_ids[faceIdx]) {
+                            const clusterId = faceIdToCluster[state.hoveredFaceId];
+                            const c = state.clusters[clusterId];
+                            if (c) showTooltip(c, e.clientX, e.clientY);
+                        }
+                    });
+                    polygon.addEventListener('mouseleave', (e) => {
+                        setHoveredFace(null, e.clientX, e.clientY);
+                    });
+                    polygon.addEventListener('click', () => {
+                        setSelectedCluster(idx);
+                    });
+
+                    svg.appendChild(polygon);
+                });
+
+                // Draw fold lines (interior edges with fold direction)
+                if (cluster.fold_edges) {
+                    cluster.fold_edges.forEach(edge => {
+                        const sv1 = uvToSvg(edge.v1[0], edge.v1[1]);
+                        const sv2 = uvToSvg(edge.v2[0], edge.v2[1]);
+
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', sv1.x);
+                        line.setAttribute('y1', sv1.y);
+                        line.setAttribute('x2', sv2.x);
+                        line.setAttribute('y2', sv2.y);
+                        line.setAttribute('stroke-width', '1');
+
+                        if (edge.fold_type === 'valley') {
+                            // Valley fold (fold in): solid blue line
+                            line.setAttribute('stroke', '#2980b9');
+                            line.setAttribute('stroke-dasharray', 'none');
+                        } else {
+                            // Mountain fold (fold out): dashed red line
+                            line.setAttribute('stroke', '#c0392b');
+                            line.setAttribute('stroke-dasharray', '4,2');
+                        }
+
+                        svg.appendChild(line);
+                    });
+                }
+
+                panel.appendChild(svg);
+                container.appendChild(panel);
+
+                // Click to select cluster
+                panel.addEventListener('click', () => {
+                    setSelectedCluster(idx);
+                });
+            });
+        }
+
+        // API calls
+        async function loadMesh(meshId) {
+            setStatus('Loading mesh...');
+            const res = await fetch(`/api/meshes/load/${meshId}`, { method: 'POST' });
+            if (!res.ok) throw new Error('Failed to load mesh');
+            const data = await res.json();
+            setStatus(`Loaded ${meshId}: ${data.vertices} vertices, ${data.faces} faces`);
+            document.getElementById('cluster-btn').disabled = false;
+        }
+
+        async function uploadMesh(file) {
+            setStatus('Uploading...');
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/meshes/upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error('Failed to upload');
+            const data = await res.json();
+            setStatus(`Uploaded ${file.name}: ${data.vertices} vertices, ${data.faces} faces`);
+            document.getElementById('cluster-btn').disabled = false;
+        }
+
+        async function runClustering() {
+            const algorithm = document.getElementById('algorithm-select').value;
+            setStatus(`Running ${algorithm} clustering...`);
+            const res = await fetch('/api/cluster', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ algorithm, max_distortion: 0.3 }),
+            });
+            if (!res.ok) throw new Error('Clustering failed');
+            const data = await res.json();
+            setStatus(`Created ${data.num_clusters} clusters (${(data.interior_edge_ratio * 100).toFixed(1)}% interior edges)`);
+            document.getElementById('flatten-btn').disabled = false;
+        }
+
+        async function runFlatten() {
+            const method = document.getElementById('flatten-select').value;
+            setStatus(`Flattening with ${method} method...`);
+            const res = await fetch('/api/flatten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ method }),
+            });
+            if (!res.ok) throw new Error('Flattening failed');
+
+            // Load full scene data
+            setStatus('Loading scene data...');
+            const exportRes = await fetch('/api/export/json');
+            if (!exportRes.ok) throw new Error('Failed to export');
+            const sceneData = await exportRes.json();
+
+            loadMeshData(sceneData);
+            setStatus(`Flattened ${sceneData.clusters.length} clusters`);
+            document.getElementById('export-btn').disabled = false;
+            document.getElementById('export-pdf-btn').disabled = false;
+            document.getElementById('print-preview-btn').disabled = false;
+            document.getElementById('assembly-sim-btn').disabled = false;
+        }
+
+        function exportSVG() {
+            // Letter paper: 8.5" x 11" (portrait)
+            window.open('/api/export/svg', '_blank');
+        }
+
+        function exportPDF() {
+            // Letter paper: 8.5" x 11" (portrait) with cut lines and fold tabs
+            window.open('/api/export/pdf', '_blank');
+        }
+
+        // ============ Print Preview ============
+        const PAGE_WIDTH_IN = 8.5;
+        const PAGE_HEIGHT_IN = 11;
+        const PREVIEW_DPI = 72; // Preview scale
+        const PAGE_WIDTH_PX = PAGE_WIDTH_IN * PREVIEW_DPI;
+        const PAGE_HEIGHT_PX = PAGE_HEIGHT_IN * PREVIEW_DPI;
+        const MARGIN_PX = 0.5 * PREVIEW_DPI; // 0.5 inch margin
+
+        let clusterPositions = []; // {clusterId, x, y, width, height, page}
+        let dragState = null;
+        let currentPage = 0;
+        let totalPages = 1;
+        let printScale = 1.0; // inches per 3D unit (adjustable)
+
+        function openPrintPreview() {
+            const modal = document.getElementById('print-preview-modal');
+            const palette = document.getElementById('palette-items');
+
+            // Calculate how many pages we need based on cluster sizes
+            const contentWidth = PAGE_WIDTH_PX - 2 * MARGIN_PX;
+            const contentHeight = PAGE_HEIGHT_PX - 2 * MARGIN_PX;
+
+            // Initialize cluster positions
+            clusterPositions = [];
+            palette.innerHTML = '';
+
+            // Calculate real-world sizes using scale_factor from backend
+            // scale_factor = 3D_length / UV_length, so:
+            // real_size_in_3d_units = UV_size * scale_factor
+            // real_size_in_inches = real_size_in_3d_units * printScale
+
+            const clustersWithSize = [];
+            let maxRealSize = 0; // Track largest cluster for auto-scaling
+
+            state.clusters.forEach((cluster, idx) => {
+                if (!cluster.uv_vertices || !cluster.bbox) return;
+
+                const bbox = cluster.bbox;
+                const uvW = bbox.max[0] - bbox.min[0];
+                const uvH = bbox.max[1] - bbox.min[1];
+
+                // Get the scale factor (3D units per UV unit)
+                const scaleFactor = cluster.scale_factor || 1.0;
+
+                // Real size in 3D model units
+                const realW = uvW * scaleFactor;
+                const realH = uvH * scaleFactor;
+
+                maxRealSize = Math.max(maxRealSize, realW, realH);
+
+                clustersWithSize.push({
+                    idx,
+                    cluster,
+                    realWidth: realW,   // in 3D units
+                    realHeight: realH,  // in 3D units
+                    scaleFactor: scaleFactor
+                });
+            });
+
+            // Auto-calculate printScale so largest cluster fits on page (with margin)
+            const maxPrintableInches = Math.min(
+                (PAGE_WIDTH_IN - 1.0),   // 0.5" margin each side
+                (PAGE_HEIGHT_IN - 1.0)
+            ) * 0.8; // Leave some room
+            printScale = maxRealSize > 0 ? maxPrintableInches / maxRealSize : 1.0;
+
+            // Check if any piece is oversized (would require scaling down significantly)
+            // Alert if we have to scale below 0.5" per 3D unit (50% reduction)
+            const oversizedClusters = [];
+            const minReasonableScale = 0.5; // 0.5 inches per 3D unit
+            clustersWithSize.forEach(item => {
+                const atMinScale = Math.max(item.realWidth, item.realHeight) * minReasonableScale;
+                if (atMinScale > maxPrintableInches) {
+                    oversizedClusters.push({
+                        id: item.idx,
+                        width: item.realWidth,
+                        height: item.realHeight,
+                        minScale: maxPrintableInches / Math.max(item.realWidth, item.realHeight)
+                    });
+                }
+            });
+
+            if (oversizedClusters.length > 0) {
+                const clusterList = oversizedClusters.map(c =>
+                    `Cluster ${c.id}: ${c.width.toFixed(2)} × ${c.height.toFixed(2)} units (requires ${c.minScale.toFixed(2)}"/unit)`
+                ).join('\n');
+                alert(`⚠️ Oversized pieces detected!\n\nThe following clusters are larger than a single page at reasonable scale:\n\n${clusterList}\n\nThe print scale has been automatically adjusted to fit.`);
+            }
+
+            // Now calculate pixel sizes for preview
+            clustersWithSize.forEach(item => {
+                // Convert to inches then to pixels
+                const widthInches = item.realWidth * printScale;
+                const heightInches = item.realHeight * printScale;
+                item.width = Math.max(widthInches * PREVIEW_DPI, 30);
+                item.height = Math.max(heightInches * PREVIEW_DPI, 30);
+            });
+
+            // Simple bin-packing: fit clusters on pages
+            let currentPageNum = 0;
+            let rowY = MARGIN_PX;
+            let rowX = MARGIN_PX;
+            let rowHeight = 0;
+
+            clustersWithSize.forEach((item, i) => {
+                // Check if cluster fits in current row
+                if (rowX + item.width > PAGE_WIDTH_PX - MARGIN_PX) {
+                    // Move to next row
+                    rowX = MARGIN_PX;
+                    rowY += rowHeight + 20;
+                    rowHeight = 0;
+                }
+
+                // Check if we need a new page
+                if (rowY + item.height > PAGE_HEIGHT_PX - MARGIN_PX) {
+                    currentPageNum++;
+                    rowX = MARGIN_PX;
+                    rowY = MARGIN_PX;
+                    rowHeight = 0;
+                }
+
+                const pos = {
+                    clusterId: item.idx,
+                    x: rowX,
+                    y: rowY,
+                    width: item.width,
+                    height: item.height,
+                    page: currentPageNum,
+                    color: item.cluster.color,
+                    cluster: item.cluster,
+                    scaleFactor: item.scaleFactor,
+                    realWidth: item.realWidth,
+                    realHeight: item.realHeight
+                };
+                clusterPositions.push(pos);
+
+                rowX += item.width + 15;
+                rowHeight = Math.max(rowHeight, item.height);
+
+                // Add to palette
+                const paletteItem = document.createElement('div');
+                paletteItem.className = 'palette-item';
+                paletteItem.dataset.cluster = item.idx;
+                paletteItem.innerHTML = `
+                    <div class="color-swatch" style="background: ${item.cluster.color}"></div>
+                    <span>Cluster ${item.idx} (pg ${pos.page + 1})</span>
+                `;
+                paletteItem.onclick = () => {
+                    // Go to page and highlight
+                    currentPage = pos.page;
+                    renderCurrentPage();
+                    document.querySelectorAll('.draggable-cluster').forEach(el => {
+                        el.style.borderColor = el.dataset.cluster == item.idx ? '#e74c3c' : 'transparent';
+                    });
+                };
+                palette.appendChild(paletteItem);
+            });
+
+            totalPages = currentPageNum + 1;
+            currentPage = 0;
+            renderCurrentPage();
+
+            modal.classList.remove('hidden');
+        }
+
+        function renderCurrentPage() {
+            const canvas = document.getElementById('page-canvas');
+            canvas.style.width = PAGE_WIDTH_PX + 'px';
+            canvas.style.height = PAGE_HEIGHT_PX + 'px';
+            canvas.innerHTML = '';
+
+            // Draw margin guides
+            const marginRect = document.createElement('div');
+            marginRect.style.cssText = `
+                position: absolute;
+                left: ${MARGIN_PX}px;
+                top: ${MARGIN_PX}px;
+                width: ${PAGE_WIDTH_PX - 2 * MARGIN_PX}px;
+                height: ${PAGE_HEIGHT_PX - 2 * MARGIN_PX}px;
+                border: 1px dashed #ccc;
+                pointer-events: none;
+            `;
+            canvas.appendChild(marginRect);
+
+            // Page indicator
+            const pageIndicator = document.createElement('div');
+            pageIndicator.style.cssText = `
+                position: absolute;
+                top: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 11px;
+                color: #666;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            pageIndicator.innerHTML = `
+                <button onclick="prevPage()" style="padding: 2px 8px; font-size: 10px;" ${currentPage === 0 ? 'disabled' : ''}>◀</button>
+                <span>Page ${currentPage + 1} of ${totalPages}</span>
+                <button onclick="nextPage()" style="padding: 2px 8px; font-size: 10px;" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>▶</button>
+            `;
+            canvas.appendChild(pageIndicator);
+
+            // Draw clusters for current page
+            clusterPositions
+                .filter(pos => pos.page === currentPage)
+                .forEach(pos => addClusterToCanvas(pos, canvas));
+        }
+
+        window.prevPage = function() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderCurrentPage();
+            }
+        };
+
+        window.nextPage = function() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                renderCurrentPage();
+            }
+        };
+
+        function addClusterToCanvas(pos, canvas) {
+            const cluster = pos.cluster;
+            const div = document.createElement('div');
+            div.className = 'draggable-cluster';
+            div.dataset.cluster = pos.clusterId;
+            div.style.left = pos.x + 'px';
+            div.style.top = pos.y + 'px';
+            div.style.width = pos.width + 'px';
+            div.style.height = pos.height + 'px';
+
+            // Get bbox for normalizing UV coords (now in 3D units, not 0-1)
+            const bbox = cluster.bbox;
+            const bboxMinX = bbox ? bbox.min[0] : 0;
+            const bboxMinY = bbox ? bbox.min[1] : 0;
+            const bboxW = bbox ? (bbox.max[0] - bbox.min[0]) : 1;
+            const bboxH = bbox ? (bbox.max[1] - bbox.min[1]) : 1;
+
+            // Helper function to normalize UV coords to 0-100 SVG viewBox
+            function uvToSvg(uvX, uvY) {
+                const normX = bboxW > 0 ? (uvX - bboxMinX) / bboxW : 0;
+                const normY = bboxH > 0 ? (uvY - bboxMinY) / bboxH : 0;
+                return {
+                    x: normX * 90 + 5,
+                    y: (1 - normY) * 90 + 5
+                };
+            }
+
+            // Create SVG for cluster faces
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', '0 0 100 100');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+            // Draw faces
+            if (cluster.uv_faces) {
+                cluster.uv_faces.forEach((face, faceIdx) => {
+                    const points = face.map(localIdx => {
+                        const uv = cluster.uv_vertices[localIdx];
+                        const svgCoord = uvToSvg(uv[0], uv[1]);
+                        return `${svgCoord.x},${svgCoord.y}`;
+                    }).join(' ');
+
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points);
+                    polygon.setAttribute('fill', pos.color);
+                    polygon.setAttribute('fill-opacity', '0.2');
+                    polygon.setAttribute('stroke', '#000');
+                    polygon.setAttribute('stroke-width', '2');
+                    svg.appendChild(polygon);
+                });
+            }
+
+            // Draw seam edge labels
+            if (cluster.seam_edges) {
+                cluster.seam_edges.forEach(edge => {
+                    // Convert UV coords to SVG coords using bbox normalization
+                    const sv1 = uvToSvg(edge.v1[0], edge.v1[1]);
+                    const sv2 = uvToSvg(edge.v2[0], edge.v2[1]);
+                    const x1 = sv1.x, y1 = sv1.y;
+                    const x2 = sv2.x, y2 = sv2.y;
+
+                    // Draw edge highlight
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('stroke', '#e74c3c');
+                    line.setAttribute('stroke-width', '2');
+                    line.setAttribute('stroke-dasharray', '3,2');
+                    svg.appendChild(line);
+
+                    // Calculate midpoint and label position
+                    const midX = (x1 + x2) / 2;
+                    const midY = (y1 + y2) / 2;
+
+                    // Calculate perpendicular offset for label
+                    const dx = x2 - x1;
+                    const dy = y2 - y1;
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    const offsetX = len > 0 ? (-dy / len) * 6 : 0;
+                    const offsetY = len > 0 ? (dx / len) * 6 : 0;
+
+                    // Background rect for label - wider for full edge pairing
+                    const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    labelBg.setAttribute('x', midX + offsetX - 18);
+                    labelBg.setAttribute('y', midY + offsetY - 5);
+                    labelBg.setAttribute('width', '36');
+                    labelBg.setAttribute('height', '10');
+                    labelBg.setAttribute('fill', 'white');
+                    labelBg.setAttribute('fill-opacity', '0.95');
+                    labelBg.setAttribute('rx', '2');
+                    labelBg.setAttribute('stroke', '#c0392b');
+                    labelBg.setAttribute('stroke-width', '0.5');
+                    svg.appendChild(labelBg);
+
+                    // Label text - show full edge pairing
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX + offsetX);
+                    text.setAttribute('y', midY + offsetY + 3);
+                    text.setAttribute('font-size', '5');
+                    text.setAttribute('font-family', 'Arial, sans-serif');
+                    text.setAttribute('fill', '#c0392b');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-weight', 'bold');
+                    // Use full label like "E0↔C2-E3"
+                    text.textContent = edge.label || `E${edge.my_edge}↔${edge.connects_to}-E${edge.their_edge}`;
+                    svg.appendChild(text);
+                });
+            }
+
+            // Draw fold lines (interior edges with fold direction)
+            if (cluster.fold_edges) {
+                cluster.fold_edges.forEach(edge => {
+                    const sv1 = uvToSvg(edge.v1[0], edge.v1[1]);
+                    const sv2 = uvToSvg(edge.v2[0], edge.v2[1]);
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', sv1.x);
+                    line.setAttribute('y1', sv1.y);
+                    line.setAttribute('x2', sv2.x);
+                    line.setAttribute('y2', sv2.y);
+                    line.setAttribute('stroke-width', '1.5');
+
+                    if (edge.fold_type === 'valley') {
+                        // Valley fold (fold in): solid blue line
+                        line.setAttribute('stroke', '#2980b9');
+                        line.setAttribute('stroke-dasharray', 'none');
+                    } else {
+                        // Mountain fold (fold out): dashed red line
+                        line.setAttribute('stroke', '#c0392b');
+                        line.setAttribute('stroke-dasharray', '5,3');
+                    }
+
+                    svg.appendChild(line);
+                });
+            }
+
+            div.appendChild(svg);
+
+            // Add label
+            const label = document.createElement('div');
+            label.className = 'cluster-label';
+            label.textContent = `Cluster ${pos.clusterId}`;
+            div.appendChild(label);
+
+            // Drag handlers
+            div.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                dragState = {
+                    el: div,
+                    clusterId: pos.clusterId,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    origX: pos.x,
+                    origY: pos.y
+                };
+                div.classList.add('dragging');
+            });
+
+            canvas.appendChild(div);
+        }
+
+        // Global mouse handlers for dragging
+        document.addEventListener('mousemove', (e) => {
+            if (!dragState) return;
+
+            const dx = e.clientX - dragState.startX;
+            const dy = e.clientY - dragState.startY;
+            const newX = Math.max(0, Math.min(PAGE_WIDTH_PX - 50, dragState.origX + dx));
+            const newY = Math.max(20, Math.min(PAGE_HEIGHT_PX - 50, dragState.origY + dy));
+
+            dragState.el.style.left = newX + 'px';
+            dragState.el.style.top = newY + 'px';
+
+            // Update position in array
+            const pos = clusterPositions.find(p => p.clusterId === dragState.clusterId);
+            if (pos) {
+                pos.x = newX;
+                pos.y = newY;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (dragState) {
+                dragState.el.classList.remove('dragging');
+                dragState = null;
+            }
+        });
+
+        function closePrintPreview() {
+            document.getElementById('print-preview-modal').classList.add('hidden');
+        }
+
+        function autoArrangeClusters() {
+            // Re-run auto pagination
+            const contentWidth = PAGE_WIDTH_PX - 2 * MARGIN_PX;
+            const contentHeight = PAGE_HEIGHT_PX - 2 * MARGIN_PX;
+
+            let currentPageNum = 0;
+            let rowY = MARGIN_PX;
+            let rowX = MARGIN_PX;
+            let rowHeight = 0;
+
+            clusterPositions.forEach((pos) => {
+                if (rowX + pos.width > PAGE_WIDTH_PX - MARGIN_PX) {
+                    rowX = MARGIN_PX;
+                    rowY += rowHeight + 20;
+                    rowHeight = 0;
+                }
+
+                if (rowY + pos.height > PAGE_HEIGHT_PX - MARGIN_PX) {
+                    currentPageNum++;
+                    rowX = MARGIN_PX;
+                    rowY = MARGIN_PX;
+                    rowHeight = 0;
+                }
+
+                pos.x = rowX;
+                pos.y = rowY;
+                pos.page = currentPageNum;
+
+                rowX += pos.width + 15;
+                rowHeight = Math.max(rowHeight, pos.height);
+            });
+
+            totalPages = currentPageNum + 1;
+            renderCurrentPage();
+
+            // Update palette page numbers
+            clusterPositions.forEach(pos => {
+                const item = document.querySelector(`.palette-item[data-cluster="${pos.clusterId}"] span`);
+                if (item) {
+                    item.textContent = `Cluster ${pos.clusterId} (pg ${pos.page + 1})`;
+                }
+            });
+        }
+
+        async function exportFromPreview() {
+            // Send custom positions to server with proper scaling
+            const contentWidth = PAGE_WIDTH_PX - 2 * MARGIN_PX;
+            const contentHeight = PAGE_HEIGHT_PX - 2 * MARGIN_PX;
+
+            const positions = clusterPositions.map(pos => ({
+                cluster_id: pos.clusterId,
+                x: (pos.x - MARGIN_PX) / contentWidth,
+                y: (pos.y - MARGIN_PX) / contentHeight,
+                page: pos.page,
+                scale_factor: pos.scaleFactor || 1.0,
+                width_inches: pos.realWidth * printScale,
+                height_inches: pos.realHeight * printScale
+            }));
+
+            try {
+                const response = await fetch('/api/export/pdf/custom', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        positions,
+                        page_width: PAGE_WIDTH_IN,
+                        page_height: PAGE_HEIGHT_IN,
+                        show_cut_lines: true,
+                        show_fold_tabs: true,
+                        print_scale: printScale  // inches per 3D unit
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                } else {
+                    alert('Export failed: ' + (await response.text()));
+                }
+            } catch (err) {
+                alert('Export error: ' + err.message);
+            }
+        }
+
+        // Print preview event handlers
+        document.getElementById('print-preview-btn').addEventListener('click', openPrintPreview);
+        document.getElementById('close-preview-btn').addEventListener('click', closePrintPreview);
+        document.getElementById('auto-arrange-btn').addEventListener('click', autoArrangeClusters);
+        document.getElementById('preview-export-pdf-btn').addEventListener('click', exportFromPreview);
+
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePrintPreview();
+                closeAssemblySimulation();
+            }
+        });
+
+        function setStatus(text) {
+            document.getElementById('status-text').innerHTML = `<span class="info">${text}</span>`;
+        }
+
+        // Event handlers
+        document.getElementById('mesh-select').addEventListener('change', async (e) => {
+            if (e.target.value) {
+                try {
+                    await loadMesh(e.target.value);
+                } catch (err) {
+                    setStatus(`Error: ${err.message}`);
+                }
+            }
+        });
+
+        document.getElementById('file-upload').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                try {
+                    await uploadMesh(e.target.files[0]);
+                } catch (err) {
+                    setStatus(`Error: ${err.message}`);
+                }
+            }
+        });
+
+        document.getElementById('cluster-btn').addEventListener('click', async () => {
+            try {
+                await runClustering();
+            } catch (err) {
+                setStatus(`Error: ${err.message}`);
+            }
+        });
+
+        document.getElementById('flatten-btn').addEventListener('click', async () => {
+            try {
+                await runFlatten();
+            } catch (err) {
+                setStatus(`Error: ${err.message}`);
+            }
+        });
+
+        document.getElementById('export-btn').addEventListener('click', exportSVG);
+        document.getElementById('export-pdf-btn').addEventListener('click', exportPDF);
+
+        // ============ Assembly Simulation ============
+        const assemblyState = {
+            isPlaying: false,
+            progress: 0.0,        // 0 = flat, 1 = assembled
+            speed: 1.0,
+            startTime: null,
+            pauseProgress: 0,
+            scene: null,
+            camera: null,
+            renderer: null,
+            controls: null,
+            animationMesh: null,
+            flatPositions: null,   // Float32Array of flat (2D) positions
+            assembledPositions: null, // Float32Array of 3D positions
+            animationId: null,
+            seamLines: null,
+        };
+
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        function initAssemblyScene() {
+            const container = document.getElementById('assembly-viewport');
+
+            // Create new scene for assembly
+            assemblyState.scene = new THREE.Scene();
+            assemblyState.scene.background = new THREE.Color(0x16213e);
+
+            assemblyState.camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            assemblyState.camera.position.set(5, 5, 5);
+
+            assemblyState.renderer = new THREE.WebGLRenderer({ antialias: true });
+            assemblyState.renderer.setSize(container.clientWidth, container.clientHeight);
+            assemblyState.renderer.setPixelRatio(window.devicePixelRatio);
+            container.innerHTML = '';
+            container.appendChild(assemblyState.renderer.domElement);
+
+            assemblyState.controls = new OrbitControls(assemblyState.camera, assemblyState.renderer.domElement);
+            assemblyState.controls.enableDamping = true;
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            assemblyState.scene.add(ambient);
+            const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+            directional.position.set(5, 10, 7);
+            assemblyState.scene.add(directional);
+
+            // Grid
+            const grid = new THREE.GridHelper(10, 10, 0x333333, 0x222222);
+            assemblyState.scene.add(grid);
+
+            // Build animated mesh
+            buildAssemblyMesh();
+
+            // Center camera
+            centerAssemblyCamera();
+        }
+
+        function buildAssemblyMesh() {
+            if (!state.mesh || !state.clusters) return;
+
+            const positions = [];
+            const colors = [];
+            const flatPos = [];
+            const assembledPos = [];
+
+            // Calculate flat layout dimensions
+            const numClusters = state.clusters.length;
+            const gridCols = Math.ceil(Math.sqrt(numClusters));
+
+            // First pass: calculate proper scale for each cluster to match 3D size
+            const clusterScales = [];
+            const clusterCenters = [];
+            const clusterSizes = [];
+
+            state.clusters.forEach((cluster, clusterIdx) => {
+                if (!cluster.uv_vertices || !cluster.uv_faces || !cluster.local_to_global) {
+                    clusterScales.push(1);
+                    clusterCenters.push({ u: 0.5, v: 0.5 });
+                    clusterSizes.push(1);
+                    return;
+                }
+
+                // Get UV bounding box and center
+                let minU = Infinity, maxU = -Infinity;
+                let minV = Infinity, maxV = -Infinity;
+                cluster.uv_vertices.forEach(uv => {
+                    minU = Math.min(minU, uv[0]);
+                    maxU = Math.max(maxU, uv[0]);
+                    minV = Math.min(minV, uv[1]);
+                    maxV = Math.max(maxV, uv[1]);
+                });
+                const centerU = (minU + maxU) / 2;
+                const centerV = (minV + maxV) / 2;
+                clusterCenters.push({ u: centerU, v: centerV });
+
+                // Calculate scale by comparing UV edge lengths to 3D edge lengths
+                let totalUVLength = 0;
+                let total3DLength = 0;
+                let edgeCount = 0;
+
+                cluster.uv_faces.forEach((face, faceIdx) => {
+                    for (let i = 0; i < face.length; i++) {
+                        const localIdx1 = face[i];
+                        const localIdx2 = face[(i + 1) % face.length];
+
+                        // UV edge length
+                        const uv1 = cluster.uv_vertices[localIdx1];
+                        const uv2 = cluster.uv_vertices[localIdx2];
+                        const uvDx = uv2[0] - uv1[0];
+                        const uvDy = uv2[1] - uv1[1];
+                        const uvLen = Math.sqrt(uvDx * uvDx + uvDy * uvDy);
+
+                        // 3D edge length
+                        const globalV1 = cluster.local_to_global[String(localIdx1)];
+                        const globalV2 = cluster.local_to_global[String(localIdx2)];
+
+                        if (globalV1 !== undefined && globalV2 !== undefined &&
+                            state.mesh.vertices[globalV1] && state.mesh.vertices[globalV2]) {
+                            const p1 = state.mesh.vertices[globalV1];
+                            const p2 = state.mesh.vertices[globalV2];
+                            const dx = p2[0] - p1[0];
+                            const dy = p2[1] - p1[1];
+                            const dz = p2[2] - p1[2];
+                            const len3D = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                            if (uvLen > 0.0001 && len3D > 0.0001) {
+                                totalUVLength += uvLen;
+                                total3DLength += len3D;
+                                edgeCount++;
+                            }
+                        }
+                    }
+                });
+
+                // Scale factor: 3D length / UV length
+                const scale = edgeCount > 0 ? total3DLength / totalUVLength : 1;
+                clusterScales.push(scale);
+
+                // Calculate actual size of cluster in world units for spacing
+                const uvWidth = maxU - minU;
+                const uvHeight = maxV - minV;
+                const worldSize = Math.max(uvWidth, uvHeight) * scale;
+                clusterSizes.push(worldSize);
+            });
+
+            // Calculate dynamic spacing based on largest cluster
+            const maxClusterSize = Math.max(...clusterSizes, 1);
+            const spacing = maxClusterSize * 1.3;
+
+            // Second pass: build geometry with proper scaling
+            state.clusters.forEach((cluster, clusterIdx) => {
+                if (!cluster.uv_vertices || !cluster.uv_faces) return;
+
+                const color = new THREE.Color(cluster.color);
+                const uvScale = clusterScales[clusterIdx];
+                const center = clusterCenters[clusterIdx];
+
+                // Calculate flat offset for this cluster (spread on XZ plane)
+                const gridX = clusterIdx % gridCols;
+                const gridZ = Math.floor(clusterIdx / gridCols);
+                const offsetX = (gridX - gridCols / 2) * spacing;
+                const offsetZ = (gridZ - gridCols / 2) * spacing;
+
+                cluster.uv_faces.forEach((face, faceIdx) => {
+                    // Triangulate face
+                    for (let i = 1; i < face.length - 1; i++) {
+                        const localIndices = [face[0], face[i], face[i + 1]];
+
+                        localIndices.forEach(localIdx => {
+                            // UV (flat) position - scaled to match 3D size, on XZ plane at Y=0
+                            const uv = cluster.uv_vertices[localIdx];
+                            const flatX = offsetX + (uv[0] - center.u) * uvScale;
+                            const flatY = 0;
+                            const flatZ = offsetZ + (uv[1] - center.v) * uvScale;
+                            flatPos.push(flatX, flatY, flatZ);
+
+                            // 3D assembled position
+                            const localToGlobal = cluster.local_to_global;
+                            const globalVertId = localToGlobal ? localToGlobal[String(localIdx)] : localIdx;
+
+                            // Get 3D position from mesh
+                            let pos3D = [0, 0, 0];
+                            if (globalVertId !== undefined && state.mesh.vertices[globalVertId]) {
+                                pos3D = state.mesh.vertices[globalVertId];
+                            }
+                            assembledPos.push(pos3D[0], pos3D[1], pos3D[2]);
+
+                            // Start at flat position
+                            positions.push(flatX, flatY, flatZ);
+                            colors.push(color.r, color.g, color.b);
+                        });
+                    }
+                });
+            });
+
+            // Store positions for animation
+            assemblyState.flatPositions = new Float32Array(flatPos);
+            assemblyState.assembledPositions = new Float32Array(assembledPos);
+
+            // Create geometry
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.computeVertexNormals();
+
+            const material = new THREE.MeshLambertMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+            });
+
+            // Remove old mesh if exists
+            if (assemblyState.animationMesh) {
+                assemblyState.scene.remove(assemblyState.animationMesh);
+                assemblyState.animationMesh.geometry.dispose();
+            }
+
+            assemblyState.animationMesh = new THREE.Mesh(geometry, material);
+            assemblyState.scene.add(assemblyState.animationMesh);
+
+            // Add seam edge lines
+            buildSeamLines();
+        }
+
+        function buildSeamLines() {
+            // Remove old lines
+            if (assemblyState.seamLines) {
+                assemblyState.scene.remove(assemblyState.seamLines);
+                assemblyState.seamLines.geometry.dispose();
+            }
+
+            const linePositions = [];
+            const numClusters = state.clusters.length;
+            const gridCols = Math.ceil(Math.sqrt(numClusters));
+
+            // First pass: calculate scales (same as buildAssemblyMesh)
+            const clusterScales = [];
+            const clusterCenters = [];
+            const clusterSizes = [];
+
+            state.clusters.forEach((cluster, clusterIdx) => {
+                if (!cluster.uv_vertices || !cluster.uv_faces || !cluster.local_to_global) {
+                    clusterScales.push(1);
+                    clusterCenters.push({ u: 0.5, v: 0.5 });
+                    clusterSizes.push(1);
+                    return;
+                }
+
+                let minU = Infinity, maxU = -Infinity;
+                let minV = Infinity, maxV = -Infinity;
+                cluster.uv_vertices.forEach(uv => {
+                    minU = Math.min(minU, uv[0]);
+                    maxU = Math.max(maxU, uv[0]);
+                    minV = Math.min(minV, uv[1]);
+                    maxV = Math.max(maxV, uv[1]);
+                });
+                clusterCenters.push({ u: (minU + maxU) / 2, v: (minV + maxV) / 2 });
+
+                let totalUVLength = 0;
+                let total3DLength = 0;
+                let edgeCount = 0;
+
+                cluster.uv_faces.forEach((face) => {
+                    for (let i = 0; i < face.length; i++) {
+                        const localIdx1 = face[i];
+                        const localIdx2 = face[(i + 1) % face.length];
+                        const uv1 = cluster.uv_vertices[localIdx1];
+                        const uv2 = cluster.uv_vertices[localIdx2];
+                        const uvLen = Math.sqrt((uv2[0]-uv1[0])**2 + (uv2[1]-uv1[1])**2);
+
+                        const globalV1 = cluster.local_to_global[String(localIdx1)];
+                        const globalV2 = cluster.local_to_global[String(localIdx2)];
+                        if (globalV1 !== undefined && globalV2 !== undefined &&
+                            state.mesh.vertices[globalV1] && state.mesh.vertices[globalV2]) {
+                            const p1 = state.mesh.vertices[globalV1];
+                            const p2 = state.mesh.vertices[globalV2];
+                            const len3D = Math.sqrt((p2[0]-p1[0])**2 + (p2[1]-p1[1])**2 + (p2[2]-p1[2])**2);
+                            if (uvLen > 0.0001 && len3D > 0.0001) {
+                                totalUVLength += uvLen;
+                                total3DLength += len3D;
+                                edgeCount++;
+                            }
+                        }
+                    }
+                });
+
+                const scale = edgeCount > 0 ? total3DLength / totalUVLength : 1;
+                clusterScales.push(scale);
+
+                const uvWidth = maxU - minU;
+                const uvHeight = maxV - minV;
+                clusterSizes.push(Math.max(uvWidth, uvHeight) * scale);
+            });
+
+            const maxClusterSize = Math.max(...clusterSizes, 1);
+            const spacing = maxClusterSize * 1.3;
+
+            // Build seam lines with proper scaling
+            state.clusters.forEach((cluster, clusterIdx) => {
+                if (!cluster.seam_edges || !cluster.uv_vertices) return;
+
+                const uvScale = clusterScales[clusterIdx];
+                const center = clusterCenters[clusterIdx];
+                const gridX = clusterIdx % gridCols;
+                const gridZ = Math.floor(clusterIdx / gridCols);
+                const offsetX = (gridX - gridCols / 2) * spacing;
+                const offsetZ = (gridZ - gridCols / 2) * spacing;
+
+                cluster.seam_edges.forEach(edge => {
+                    const x1 = offsetX + (edge.v1[0] - center.u) * uvScale;
+                    const z1 = offsetZ + (edge.v1[1] - center.v) * uvScale;
+                    const x2 = offsetX + (edge.v2[0] - center.u) * uvScale;
+                    const z2 = offsetZ + (edge.v2[1] - center.v) * uvScale;
+
+                    linePositions.push(x1, 0.01, z1);
+                    linePositions.push(x2, 0.01, z2);
+                });
+            });
+
+            if (linePositions.length > 0) {
+                const lineGeometry = new THREE.BufferGeometry();
+                lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+
+                const lineMaterial = new THREE.LineBasicMaterial({
+                    color: 0xe74c3c,
+                    linewidth: 2,
+                });
+
+                assemblyState.seamLines = new THREE.LineSegments(lineGeometry, lineMaterial);
+                assemblyState.scene.add(assemblyState.seamLines);
+            }
+        }
+
+        function centerAssemblyCamera() {
+            if (!assemblyState.animationMesh) return;
+
+            const box = new THREE.Box3().setFromObject(assemblyState.animationMesh);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+
+            assemblyState.camera.position.set(
+                center.x + maxDim * 1.2,
+                center.y + maxDim * 0.8,
+                center.z + maxDim * 1.2
+            );
+            assemblyState.controls.target.copy(center);
+            assemblyState.controls.update();
+        }
+
+        function updateAssemblyMesh(progress) {
+            if (!assemblyState.animationMesh) return;
+
+            const positions = assemblyState.animationMesh.geometry.getAttribute('position');
+            const flat = assemblyState.flatPositions;
+            const assembled = assemblyState.assembledPositions;
+
+            const t = easeInOutCubic(progress);
+
+            for (let i = 0; i < positions.count; i++) {
+                const i3 = i * 3;
+                positions.setXYZ(
+                    i,
+                    lerp(flat[i3], assembled[i3], t),
+                    lerp(flat[i3 + 1], assembled[i3 + 1], t),
+                    lerp(flat[i3 + 2], assembled[i3 + 2], t)
+                );
+            }
+            positions.needsUpdate = true;
+            assemblyState.animationMesh.geometry.computeVertexNormals();
+
+            // Fade out seam lines as we assemble
+            if (assemblyState.seamLines) {
+                assemblyState.seamLines.material.opacity = 1 - t * 0.7;
+                assemblyState.seamLines.material.transparent = true;
+
+                // Also move seam lines (simplified - just fade them)
+                const linePos = assemblyState.seamLines.geometry.getAttribute('position');
+                for (let i = 0; i < linePos.count; i++) {
+                    const y = lerp(0.01, 0.5 * t, t); // Lift slightly during assembly
+                    linePos.setY(i, y);
+                }
+                linePos.needsUpdate = true;
+            }
+        }
+
+        function animateAssemblyLoop() {
+            if (!assemblyState.scene) return;
+
+            assemblyState.controls.update();
+            assemblyState.renderer.render(assemblyState.scene, assemblyState.camera);
+
+            if (assemblyState.isPlaying) {
+                const now = performance.now();
+                const elapsed = now - assemblyState.startTime;
+                const duration = 3000 / assemblyState.speed; // 3 second base duration
+
+                assemblyState.progress = Math.min(assemblyState.pauseProgress + elapsed / duration, 1.0);
+
+                updateAssemblyMesh(assemblyState.progress);
+                updateAssemblyUI();
+
+                if (assemblyState.progress >= 1.0) {
+                    assemblyState.isPlaying = false;
+                    document.getElementById('assembly-play-btn').textContent = '▶ Play';
+                    document.getElementById('assembly-status').textContent = 'Assembly complete!';
+                }
+            }
+
+            assemblyState.animationId = requestAnimationFrame(animateAssemblyLoop);
+        }
+
+        function updateAssemblyUI() {
+            const percent = Math.round(assemblyState.progress * 100);
+            document.getElementById('assembly-progress').value = percent;
+            document.getElementById('assembly-progress-text').textContent = percent + '%';
+
+            let statusText = 'Assembling...';
+            if (assemblyState.progress === 0) statusText = 'Flat layout (ready to assemble)';
+            else if (assemblyState.progress >= 1) statusText = 'Assembly complete!';
+            else statusText = `Assembling... ${percent}%`;
+
+            document.getElementById('assembly-status').textContent = statusText;
+        }
+
+        function openAssemblySimulation() {
+            const modal = document.getElementById('assembly-modal');
+            modal.classList.remove('hidden');
+
+            // Reset state
+            assemblyState.progress = 0;
+            assemblyState.pauseProgress = 0;
+            assemblyState.isPlaying = false;
+            document.getElementById('assembly-play-btn').textContent = '▶ Play';
+            document.getElementById('assembly-progress').value = 0;
+            document.getElementById('assembly-progress-text').textContent = '0%';
+            document.getElementById('assembly-status').textContent = 'Flat layout (ready to assemble)';
+
+            // Initialize scene
+            initAssemblyScene();
+
+            // Start render loop
+            if (assemblyState.animationId) {
+                cancelAnimationFrame(assemblyState.animationId);
+            }
+            animateAssemblyLoop();
+        }
+
+        function closeAssemblySimulation() {
+            const modal = document.getElementById('assembly-modal');
+            modal.classList.add('hidden');
+
+            // Stop animation loop
+            if (assemblyState.animationId) {
+                cancelAnimationFrame(assemblyState.animationId);
+                assemblyState.animationId = null;
+            }
+
+            // Clean up Three.js resources
+            if (assemblyState.renderer) {
+                assemblyState.renderer.dispose();
+            }
+            assemblyState.isPlaying = false;
+        }
+
+        function toggleAssemblyPlay() {
+            if (assemblyState.isPlaying) {
+                // Pause
+                assemblyState.isPlaying = false;
+                assemblyState.pauseProgress = assemblyState.progress;
+                document.getElementById('assembly-play-btn').textContent = '▶ Play';
+            } else {
+                // Play
+                if (assemblyState.progress >= 1) {
+                    // Reset if at end
+                    assemblyState.progress = 0;
+                    assemblyState.pauseProgress = 0;
+                    updateAssemblyMesh(0);
+                }
+                assemblyState.isPlaying = true;
+                assemblyState.startTime = performance.now();
+                document.getElementById('assembly-play-btn').textContent = '⏸ Pause';
+            }
+        }
+
+        function resetAssembly() {
+            assemblyState.isPlaying = false;
+            assemblyState.progress = 0;
+            assemblyState.pauseProgress = 0;
+            document.getElementById('assembly-play-btn').textContent = '▶ Play';
+            updateAssemblyMesh(0);
+            updateAssemblyUI();
+        }
+
+        function onAssemblyProgressChange(e) {
+            const value = parseInt(e.target.value) / 100;
+            assemblyState.progress = value;
+            assemblyState.pauseProgress = value;
+            if (assemblyState.isPlaying) {
+                assemblyState.startTime = performance.now();
+            }
+            updateAssemblyMesh(value);
+            updateAssemblyUI();
+        }
+
+        function onAssemblySpeedChange(e) {
+            assemblyState.speed = parseFloat(e.target.value);
+            if (assemblyState.isPlaying) {
+                // Restart timer from current progress
+                assemblyState.pauseProgress = assemblyState.progress;
+                assemblyState.startTime = performance.now();
+            }
+        }
+
+        // Assembly event handlers
+        document.getElementById('assembly-sim-btn').addEventListener('click', openAssemblySimulation);
+        document.getElementById('close-assembly-btn').addEventListener('click', closeAssemblySimulation);
+        document.getElementById('assembly-play-btn').addEventListener('click', toggleAssemblyPlay);
+        document.getElementById('assembly-reset-btn').addEventListener('click', resetAssembly);
+        document.getElementById('assembly-progress').addEventListener('input', onAssemblyProgressChange);
+        document.getElementById('assembly-speed-select').addEventListener('change', onAssemblySpeedChange);
+
+        // Initialize
+        initThree();
+    </script>
+</body>
+</html>

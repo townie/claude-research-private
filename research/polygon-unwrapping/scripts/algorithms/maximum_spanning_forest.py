@@ -12,11 +12,10 @@ import heapq
 from typing import List, Set, Dict, Optional, Callable
 from dataclasses import dataclass
 
-import sys
-sys.path.insert(0, '..')
+import numpy as np
 
-from ..utils.mesh import Mesh
-from ..utils.dual_graph import DualGraph, UnionFind
+from scripts.utils.mesh import Mesh
+from scripts.utils.dual_graph import DualGraph, UnionFind
 
 
 @dataclass

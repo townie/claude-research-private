@@ -268,6 +268,63 @@ class Mesh:
         shared = edges1 & edges2
         return list(shared)[0] if shared else None
 
+    def compute_fold_type(self, face1_id: int, face2_id: int, flat_threshold: float = 5.0) -> Tuple[str, float]:
+        """
+        Determine the fold type between two adjacent faces.
+
+        Returns:
+            Tuple of (fold_type, dihedral_angle) where:
+            - fold_type: 'valley' (fold in/convex), 'mountain' (fold out/concave), or 'flat'
+            - dihedral_angle: angle in degrees (180 = flat, <180 = convex, >180 = concave)
+
+        The fold direction is determined by checking which side of face1's plane
+        the opposite vertex of face2 lies on relative to face1's normal.
+        """
+        # Get dihedral angle first
+        dihedral = self.compute_dihedral_angle(face1_id, face2_id)
+
+        # Check if effectively flat
+        if abs(dihedral - 180.0) < flat_threshold:
+            return ('flat', dihedral)
+
+        # Get the shared edge
+        shared_edge = self.get_shared_edge(face1_id, face2_id)
+        if shared_edge is None:
+            return ('flat', 180.0)
+
+        # Get face vertices
+        face1 = self.faces[face1_id]
+        face2 = self.faces[face2_id]
+        edge_set = set(shared_edge)
+
+        # Find the opposite vertex of face2 (vertex not on shared edge)
+        opp2_candidates = [v for v in face2.vertex_ids if v not in edge_set]
+        if not opp2_candidates:
+            return ('flat', dihedral)
+        opp2_id = opp2_candidates[0]
+        opp2_pos = self.vertices[opp2_id].position
+
+        # Get face1's normal and centroid
+        n1 = self.get_face_normal(face1_id)
+        centroid1 = self.get_face_centroid(face1_id)
+
+        # Vector from face1 centroid to face2's opposite vertex
+        to_opp2 = opp2_pos - centroid1
+
+        # Check which side of face1's plane opp2 is on
+        dot_product = np.dot(to_opp2, n1)
+
+        # If opp2 is on the opposite side from where n1 points -> convex -> valley fold
+        # If opp2 is on the same side as n1 points -> concave -> mountain fold
+        if dot_product < 0:
+            # Convex edge: faces bend outward (like outside of cube)
+            # Paper needs to fold INWARD (valley fold) to recreate this
+            return ('valley', dihedral)
+        else:
+            # Concave edge: faces bend inward (like inside corner)
+            # Paper needs to fold OUTWARD (mountain fold) to recreate this
+            return ('mountain', 180.0 + (180.0 - dihedral))
+
     def total_area(self) -> float:
         """Get total surface area of the mesh."""
         return sum(self.get_face_area(f) for f in self.faces)
@@ -315,6 +372,124 @@ class Mesh:
                     face_id += 1
 
         return mesh
+
+    @classmethod
+    def from_stl(cls, filepath: str, merge_tolerance: float = 1e-6) -> 'Mesh':
+        """
+        Load mesh from STL file (ASCII or binary).
+
+        STL files store triangles with duplicated vertices, so this method
+        merges vertices that are within merge_tolerance distance.
+
+        Args:
+            filepath: Path to STL file
+            merge_tolerance: Distance threshold for merging vertices
+        """
+        import struct
+
+        mesh = cls()
+
+        # Try to detect if binary or ASCII
+        with open(filepath, 'rb') as f:
+            header = f.read(80)
+            # Check if it looks like ASCII (starts with "solid")
+            try:
+                header_str = header.decode('ascii').strip()
+                is_ascii = header_str.startswith('solid')
+            except UnicodeDecodeError:
+                is_ascii = False
+
+            # Additional check: ASCII files shouldn't have the triangle count
+            # right after header in a way that makes sense as binary
+            if is_ascii:
+                f.seek(0)
+                first_lines = f.read(1000).decode('ascii', errors='ignore')
+                # If we see 'facet normal' it's definitely ASCII
+                if 'facet normal' not in first_lines.lower():
+                    is_ascii = False
+
+        # Vertex deduplication using spatial hashing
+        vertex_map = {}  # (rounded_x, rounded_y, rounded_z) -> vertex_id
+
+        def get_or_create_vertex(pos):
+            """Get existing vertex or create new one."""
+            # Round position for hashing
+            key = (
+                round(pos[0] / merge_tolerance),
+                round(pos[1] / merge_tolerance),
+                round(pos[2] / merge_tolerance)
+            )
+            if key in vertex_map:
+                return vertex_map[key]
+
+            v_id = len(mesh.vertices)
+            mesh.add_vertex(v_id, pos)
+            vertex_map[key] = v_id
+            return v_id
+
+        if is_ascii:
+            # Parse ASCII STL
+            with open(filepath, 'r') as f:
+                face_id = 0
+                current_vertices = []
+
+                for line in f:
+                    line = line.strip().lower()
+
+                    if line.startswith('vertex'):
+                        parts = line.split()
+                        pos = [float(parts[1]), float(parts[2]), float(parts[3])]
+                        v_id = get_or_create_vertex(pos)
+                        current_vertices.append(v_id)
+
+                    elif line.startswith('endfacet'):
+                        if len(current_vertices) == 3:
+                            mesh.add_face(face_id, current_vertices)
+                            face_id += 1
+                        current_vertices = []
+        else:
+            # Parse binary STL
+            with open(filepath, 'rb') as f:
+                # Skip 80-byte header
+                f.read(80)
+
+                # Read triangle count (4 bytes, little-endian)
+                num_triangles = struct.unpack('<I', f.read(4))[0]
+
+                for face_id in range(num_triangles):
+                    # Skip normal (3 floats = 12 bytes)
+                    f.read(12)
+
+                    # Read 3 vertices (each 3 floats = 12 bytes)
+                    vertex_ids = []
+                    for _ in range(3):
+                        x, y, z = struct.unpack('<3f', f.read(12))
+                        v_id = get_or_create_vertex([x, y, z])
+                        vertex_ids.append(v_id)
+
+                    mesh.add_face(face_id, vertex_ids)
+
+                    # Skip attribute byte count (2 bytes)
+                    f.read(2)
+
+        return mesh
+
+    @classmethod
+    def load(cls, filepath: str) -> 'Mesh':
+        """
+        Load mesh from file, auto-detecting format by extension.
+
+        Supported formats: .obj, .stl
+        """
+        import os
+        ext = os.path.splitext(filepath)[1].lower()
+
+        if ext == '.obj':
+            return cls.from_obj(filepath)
+        elif ext == '.stl':
+            return cls.from_stl(filepath)
+        else:
+            raise ValueError(f"Unsupported file format: {ext}. Supported: .obj, .stl")
 
     def to_obj(self, filepath: str):
         """Save mesh to OBJ file."""

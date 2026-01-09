@@ -7,29 +7,28 @@ on various example meshes.
 
 Usage:
     python demo.py [--mesh MESH_TYPE] [--algorithm ALGORITHM] [--visualize]
+    python demo.py --file path/to/mesh.obj [--algorithm ALGORITHM]
 
 Examples:
     python demo.py --mesh cube
     python demo.py --mesh dog --algorithm all --visualize
     python demo.py --mesh cylinder --algorithm msf
+    python demo.py --file mymodel.obj --algorithm msf
 """
 
 import sys
 import argparse
 from typing import List, Set
 
-# Add parent directory to path for imports
-sys.path.insert(0, '.')
+from scripts.utils.mesh import Mesh, create_cube, create_pyramid, create_cylinder, create_simple_dog
+from scripts.utils.dual_graph import DualGraph
+from scripts.utils.edge_weights import apply_dihedral_weights, apply_composite_weights, apply_pet_weights
+from scripts.utils.quality_metrics import generate_quality_report, format_quality_report, compare_clustering_methods
+from scripts.utils.optimization import full_optimization_pipeline
 
-from utils.mesh import Mesh, create_cube, create_pyramid, create_cylinder, create_simple_dog
-from utils.dual_graph import DualGraph
-from utils.edge_weights import apply_dihedral_weights, apply_composite_weights, apply_pet_weights
-from utils.quality_metrics import generate_quality_report, format_quality_report, compare_clustering_methods
-from utils.optimization import full_optimization_pipeline
-
-from algorithms.maximum_spanning_forest import maximum_spanning_forest
-from algorithms.greedy_region_growing import greedy_region_growing
-from algorithms.hierarchical_clustering import hierarchical_clustering
+from scripts.algorithms.maximum_spanning_forest import maximum_spanning_forest
+from scripts.algorithms.greedy_region_growing import greedy_region_growing
+from scripts.algorithms.hierarchical_clustering import hierarchical_clustering
 
 
 def create_mesh(mesh_type: str) -> Mesh:
@@ -181,12 +180,16 @@ Examples:
     python demo.py --mesh dog --algorithm all
     python demo.py --mesh dog --algorithm msf --visualize
     python demo.py --mesh dog --optimize
+    python demo.py --file mymodel.obj --algorithm msf
         """
     )
 
     parser.add_argument('--mesh', type=str, default='dog',
                         choices=['cube', 'pyramid', 'cylinder', 'dog', 'dog_detailed'],
-                        help='Mesh type to use')
+                        help='Built-in mesh type to use')
+
+    parser.add_argument('--file', type=str, default=None,
+                        help='Path to mesh file (.obj or .stl) to load (overrides --mesh)')
 
     parser.add_argument('--algorithm', type=str, default='all',
                         choices=['msf', 'greedy', 'hierarchical', 'all'],
@@ -213,13 +216,24 @@ Examples:
     print("=" * 60)
 
     # Create mesh
-    print(f"\nCreating mesh: {args.mesh}")
-    mesh = create_mesh(args.mesh)
+    if args.file:
+        import os
+        print(f"\nLoading mesh from: {args.file}")
+        if not os.path.exists(args.file):
+            print(f"Error: File not found: {args.file}")
+            sys.exit(1)
+        mesh = Mesh.load(args.file)
+        mesh_name = os.path.basename(args.file)
+    else:
+        print(f"\nCreating mesh: {args.mesh}")
+        mesh = create_mesh(args.mesh)
+        mesh_name = args.mesh
+
     print(f"Mesh: {len(mesh.vertices)} vertices, {len(mesh.faces)} faces")
 
     # Apply edge weights
     dual = DualGraph(mesh)
-    if args.mesh in ['dog', 'dog_detailed']:
+    if not args.file and args.mesh in ['dog', 'dog_detailed']:
         apply_pet_weights(dual)
         print("Applied pet-optimized edge weights")
     else:
