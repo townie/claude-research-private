@@ -23,6 +23,7 @@ from scripts.utils.dual_graph import DualGraph
 from scripts.utils.edge_weights import apply_dihedral_weights, apply_pet_weights
 from scripts.utils.uv_flatten import flatten_all_clusters, FlattenMethod
 from scripts.utils.uv_packer import pack_uv_islands, export_print_svg, export_print_pdf
+from scripts.utils.rigid_unfold import rigid_unfold_all_clusters, UnfoldResult
 from scripts.algorithms.maximum_spanning_forest import maximum_spanning_forest
 from scripts.algorithms.greedy_region_growing import greedy_region_growing
 from scripts.algorithms.hierarchical_clustering import hierarchical_clustering
@@ -57,6 +58,7 @@ class AlgorithmType(str, Enum):
 class FlattenMethodType(str, Enum):
     CONFORMAL = "conformal"
     PLANAR = "planar"
+    RIGID = "rigid"  # Exact edge lengths for paper craft
 
 
 class ClusterRequest(BaseModel):
@@ -199,15 +201,28 @@ def compute_cluster_scale(mesh: Mesh, cluster: set, cluster_uv) -> float:
 
 
 def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> List[Dict]:
-    """Convert clusters and UV data to JSON, including seam edge labels."""
+    """Convert clusters and UV data to JSON, including seam edge labels.
+
+    When clusters_uv is provided and has more items (due to cluster splitting
+    in rigid unfolding), we use clusters_uv as the primary source.
+    """
     import colorsys
 
     result = []
-    n_clusters = len(clusters)
+
+    # Determine the source of cluster data
+    # If clusters_uv exists and has items, use it as primary (handles split clusters)
+    if clusters_uv:
+        n_clusters = len(clusters_uv)
+        # Build a unified cluster list from clusters_uv face_ids
+        cluster_face_ids = [set(cuv.face_ids) for cuv in clusters_uv]
+    else:
+        n_clusters = len(clusters)
+        cluster_face_ids = [set(c) for c in clusters]
 
     # Build face -> cluster mapping
     face_to_cluster = {}
-    for cluster_idx, cluster in enumerate(clusters):
+    for cluster_idx, cluster in enumerate(cluster_face_ids):
         for fid in cluster:
             face_to_cluster[fid] = cluster_idx
 
@@ -222,7 +237,9 @@ def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> Li
                 edge_to_faces[edge] = []
             edge_to_faces[edge].append((fid, i))  # face id and edge index within face
 
-    for i, cluster in enumerate(clusters):
+    for i in range(n_clusters):
+        cluster = cluster_face_ids[i]
+
         # Generate color
         hue = i / max(n_clusters, 1)
         sat = 0.7 + 0.3 * (i % 2)
@@ -246,9 +263,12 @@ def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> Li
                 "max": list(cuv.bbox_max),
             }
 
-            # Compute scale factor to match 3D dimensions
-            # This is the ratio: 3D_edge_length / UV_edge_length
-            scale_factor = compute_cluster_scale(mesh, cluster, cuv)
+            # Get scale factor - use pre-set value if available (e.g., from rigid unfolding)
+            # otherwise compute from UV vs 3D edge lengths
+            if hasattr(cuv, 'scale_factor') and cuv.scale_factor is not None:
+                scale_factor = cuv.scale_factor
+            else:
+                scale_factor = compute_cluster_scale(mesh, cluster, cuv)
             cluster_data["scale_factor"] = scale_factor
 
             # Compute cluster metrics (surface area, physical dimensions)
@@ -263,9 +283,10 @@ def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> Li
     # First assign edge numbers to all seam edges
     edge_to_cluster_edge = {}  # mesh_edge -> {cluster_id: edge_num}
 
-    for cluster_idx, cluster in enumerate(clusters):
-        if cluster_idx >= len(clusters_uv):
+    for cluster_idx in range(n_clusters):
+        if not clusters_uv or cluster_idx >= len(clusters_uv):
             continue
+        cluster = cluster_face_ids[cluster_idx]
         edge_counter = 0
         processed_edges = set()
 
@@ -299,10 +320,11 @@ def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> Li
                     edge_counter += 1
 
     # Now add seam edges to each cluster with proper labels
-    for cluster_idx, cluster in enumerate(clusters):
-        if cluster_idx >= len(clusters_uv):
+    for cluster_idx in range(n_clusters):
+        if not clusters_uv or cluster_idx >= len(clusters_uv):
             continue
 
+        cluster = cluster_face_ids[cluster_idx]
         cuv = clusters_uv[cluster_idx]
         seam_edges = []
         processed_edges = set()
@@ -352,10 +374,11 @@ def clusters_to_json(mesh: Mesh, clusters: List, clusters_uv: List = None) -> Li
         result[cluster_idx]["seam_edges"] = seam_edges
 
     # Third pass: compute interior fold edges
-    for cluster_idx, cluster in enumerate(clusters):
-        if cluster_idx >= len(clusters_uv):
+    for cluster_idx in range(n_clusters):
+        if not clusters_uv or cluster_idx >= len(clusters_uv):
             continue
 
+        cluster = cluster_face_ids[cluster_idx]
         cuv = clusters_uv[cluster_idx]
         fold_edges = []
         processed_interior_edges = set()
@@ -557,11 +580,38 @@ async def flatten_clusters(request: FlattenRequest):
     if session["clusters"] is None:
         raise HTTPException(status_code=400, detail="No clusters. Run clustering first.")
 
-    clusters_uv = flatten_all_clusters(
-        session["mesh"],
-        session["clusters"],
-        method=request.method.value
-    )
+    mesh = session["mesh"]
+    clusters = session["clusters"]
+
+    if request.method == FlattenMethodType.RIGID:
+        # Use rigid unfolding for exact edge lengths (paper craft)
+        unfold_results = rigid_unfold_all_clusters(mesh, clusters, auto_split=True)
+
+        # Convert UnfoldResult to ClusterUV format for compatibility
+        clusters_uv = []
+        for result in unfold_results:
+            from scripts.utils.uv_flatten import ClusterUV, FlattenMethod
+            cuv = ClusterUV(
+                cluster_id=result.cluster_id,
+                face_ids=result.face_ids,
+                uv_coords=result.uv_coords,
+                uv_faces=result.uv_faces,
+                local_to_global=result.local_to_global,
+                bbox_min=result.bbox_min,
+                bbox_max=result.bbox_max,
+                method=FlattenMethod.PLANAR,  # Closest match for rigid
+            )
+            # Scale factor is 1.0 for rigid unfolding (exact dimensions)
+            cuv.scale_factor = 1.0
+            clusters_uv.append(cuv)
+    else:
+        # Use LSCM or planar projection
+        clusters_uv = flatten_all_clusters(
+            mesh,
+            clusters,
+            method=request.method.value
+        )
+
     session["clusters_uv"] = clusters_uv
 
     return {

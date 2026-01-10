@@ -27,42 +27,100 @@
             background: #16213e;
         }
         #sidebar {
-            width: 400px;
+            width: 420px;
             background: #0f0f23;
             border-left: 1px solid #333;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        .controls {
-            padding: 15px;
+
+        /* Collapsible Sections */
+        .section {
             border-bottom: 1px solid #333;
         }
-        .controls h2 {
-            margin-bottom: 15px;
-            font-size: 16px;
+        .section-header {
+            padding: 12px 15px;
+            background: #1a1a2e;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .section-header:hover {
+            background: #232342;
+        }
+        .section-header h2 {
+            font-size: 13px;
             color: #7f8c8d;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 0;
+        }
+        .section-header .toggle {
+            color: #555;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        .section.collapsed .section-header .toggle {
+            transform: rotate(-90deg);
+        }
+        .section-content {
+            padding: 12px 15px;
+            display: block;
+        }
+        .section.collapsed .section-content {
+            display: none;
+        }
+
+        /* Control Groups */
+        .control-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .control-row > * {
+            flex: 1;
         }
         .control-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+        }
+        .control-group:last-child {
+            margin-bottom: 0;
         }
         .control-group label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #95a5a6;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
         }
-        select, button {
-            width: 100%;
-            padding: 10px;
+        .control-group.inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-group.inline label {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+        .control-group.inline select {
+            flex: 1;
+        }
+
+        /* Inputs */
+        select, button, input[type="text"] {
+            padding: 8px 10px;
             border: 1px solid #333;
             border-radius: 4px;
             background: #1a1a2e;
             color: #eee;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
+        }
+        select {
+            width: 100%;
         }
         select:hover, button:hover {
             border-color: #3498db;
@@ -72,6 +130,7 @@
             border-color: #3498db;
             font-weight: 500;
             transition: background 0.2s;
+            width: 100%;
         }
         button:hover {
             background: #2980b9;
@@ -80,34 +139,136 @@
             background: #333;
             border-color: #333;
             cursor: not-allowed;
+            opacity: 0.6;
         }
         button.secondary {
             background: transparent;
-            border-color: #555;
+            border-color: #444;
+            color: #aaa;
         }
         button.secondary:hover {
             background: #333;
+            color: #fff;
         }
+        button.small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        /* Workflow Buttons */
+        .workflow-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .workflow-buttons button {
+            padding: 10px 8px;
+            font-size: 12px;
+        }
+        .workflow-buttons button.primary-action {
+            grid-column: span 2;
+        }
+
+        /* Status Bar */
         .status {
-            padding: 10px 15px;
+            padding: 8px 15px;
             background: #1a1a2e;
             border-bottom: 1px solid #333;
-            font-size: 12px;
-            color: #7f8c8d;
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
         }
         .status .info {
             color: #3498db;
         }
+        .status .success {
+            color: #27ae60;
+        }
+
+        /* Clusters List */
+        #clusters-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .cluster-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .cluster-item:hover {
+            background: #232342;
+        }
+        .cluster-item.selected {
+            background: #2a2a4a;
+            border: 1px solid #3498db;
+        }
+        .cluster-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .cluster-info {
+            flex: 1;
+            font-size: 12px;
+        }
+        .cluster-info .name {
+            color: #eee;
+            font-weight: 500;
+        }
+        .cluster-info .details {
+            color: #666;
+            font-size: 11px;
+        }
+        .cluster-stats {
+            text-align: right;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* UV Panels Section */
         #uv-panels {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 10px;
+            background: #0a0a1a;
+        }
+        .uv-panels-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 5px;
+            margin-bottom: 8px;
+        }
+        .uv-panels-header h3 {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .uv-panels-header .count {
+            font-size: 11px;
+            color: #555;
+        }
+        .uv-panels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .uv-panels-grid.single-column {
+            grid-template-columns: 1fr;
         }
         .uv-panel {
             background: #1a1a2e;
             border: 1px solid #333;
             border-radius: 4px;
-            margin-bottom: 10px;
             overflow: hidden;
         }
         .uv-panel:hover {
@@ -115,19 +276,33 @@
         }
         .uv-panel.selected {
             border-color: #e74c3c;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
         }
         .uv-panel-header {
-            padding: 8px 12px;
+            padding: 6px 10px;
             background: #0f0f23;
-            font-size: 12px;
-            color: #95a5a6;
+            font-size: 11px;
+            color: #666;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        .uv-panel-header .cluster-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .uv-panel-header .cluster-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+        .uv-panel-header .size-info {
+            color: #555;
         }
         .uv-panel svg {
             width: 100%;
-            height: 150px;
+            height: 120px;
             background: #16213e;
         }
         .uv-panel svg polygon {
@@ -452,73 +627,101 @@
             </div>
         </div>
         <div id="sidebar">
-            <div class="controls">
-                <h2>Mesh</h2>
-                <div class="control-group">
-                    <label>Load Mesh</label>
-                    <select id="mesh-select">
-                        <option value="">-- Select Mesh --</option>
-                        <option value="cube">Cube</option>
-                        <option value="pyramid">Pyramid</option>
-                        <option value="cylinder">Cylinder</option>
-                        <option value="dog">Dog</option>
-                        <option value="dog_detailed">Dog (Detailed)</option>
-                    </select>
+            <!-- Configuration Section -->
+            <div class="section" id="config-section">
+                <div class="section-header" onclick="toggleSection('config-section')">
+                    <h2>Configuration</h2>
+                    <span class="toggle">▼</span>
                 </div>
-                <div class="control-group">
-                    <label>Or Upload File</label>
-                    <input type="file" id="file-upload" accept=".obj,.stl" style="display:none">
-                    <button class="secondary" onclick="document.getElementById('file-upload').click()">
-                        Upload OBJ/STL
-                    </button>
-                </div>
-            </div>
-            <div class="controls">
-                <h2>Clustering</h2>
-                <div class="control-group">
-                    <label>Algorithm</label>
-                    <select id="algorithm-select">
-                        <option value="msf">Maximum Spanning Forest</option>
-                        <option value="greedy">Greedy Region Growing</option>
-                        <option value="hierarchical">Hierarchical</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <button id="cluster-btn" disabled>Run Clustering</button>
-                </div>
-            </div>
-            <div class="controls">
-                <h2>UV Flattening</h2>
-                <div class="control-group">
-                    <label>Method</label>
-                    <select id="flatten-select">
-                        <option value="conformal">Conformal (Angle-preserving)</option>
-                        <option value="planar">Planar Projection</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <button id="flatten-btn" disabled>Flatten to 2D</button>
-                </div>
-                <div class="control-group">
-                    <button id="export-btn" class="secondary" disabled>Export Print SVG</button>
-                </div>
-                <div class="control-group">
-                    <button id="export-pdf-btn" class="secondary" disabled>Export Print PDF</button>
-                </div>
-                <div class="control-group">
-                    <button id="print-preview-btn" disabled>Print Preview</button>
-                </div>
-                <div class="control-group">
-                    <button id="assembly-sim-btn" disabled>Assembly Simulation</button>
+                <div class="section-content">
+                    <div class="control-group">
+                        <label>Mesh</label>
+                        <div class="control-row">
+                            <select id="mesh-select">
+                                <option value="">Select mesh...</option>
+                                <option value="cube">Cube</option>
+                                <option value="pyramid">Pyramid</option>
+                                <option value="cylinder">Cylinder</option>
+                                <option value="dog">Dog</option>
+                                <option value="dog_detailed">Dog (Detailed)</option>
+                            </select>
+                            <input type="file" id="file-upload" accept=".obj,.stl" style="display:none">
+                            <button class="secondary small" onclick="document.getElementById('file-upload').click()" style="flex:0 0 auto; width: auto; padding: 8px 12px;">
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>Clustering</label>
+                            <select id="algorithm-select">
+                                <option value="msf">Max Spanning Forest</option>
+                                <option value="greedy">Greedy Growing</option>
+                                <option value="hierarchical">Hierarchical</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Flattening</label>
+                            <select id="flatten-select">
+                                <option value="rigid" selected>Rigid (Exact)</option>
+                                <option value="conformal">Conformal</option>
+                                <option value="planar">Planar</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Workflow Section -->
+            <div class="section" id="workflow-section">
+                <div class="section-header" onclick="toggleSection('workflow-section')">
+                    <h2>Workflow</h2>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-buttons">
+                        <button id="cluster-btn" disabled>Cluster</button>
+                        <button id="flatten-btn" disabled>Flatten</button>
+                        <button id="print-preview-btn" class="secondary" disabled>Print Preview</button>
+                        <button id="assembly-sim-btn" class="secondary" disabled>Assembly</button>
+                        <button id="export-pdf-btn" class="secondary" disabled>Export PDF</button>
+                        <button id="export-btn" class="secondary" disabled>Export SVG</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
             <div class="status">
                 <span id="status-text">No mesh loaded</span>
+                <span id="status-stats"></span>
             </div>
+
+            <!-- Clusters Section -->
+            <div class="section" id="clusters-section">
+                <div class="section-header" onclick="toggleSection('clusters-section')">
+                    <h2>Clusters</h2>
+                    <span class="toggle">▼</span>
+                </div>
+                <div class="section-content">
+                    <div id="clusters-list">
+                        <p style="color: #555; font-size: 12px; text-align: center; padding: 20px 0;">
+                            Run clustering to see clusters
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UV Panels -->
             <div id="uv-panels">
-                <p style="color: #555; text-align: center; padding: 40px;">
-                    Load a mesh and run clustering to see UV panels
-                </p>
+                <div class="uv-panels-header">
+                    <h3>UV Layouts</h3>
+                    <span class="count" id="uv-panels-count"></span>
+                </div>
+                <div class="uv-panels-grid" id="uv-panels-grid">
+                    <p style="color: #555; font-size: 12px; text-align: center; padding: 40px 0; grid-column: span 2;">
+                        Flatten clusters to see UV layouts
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -617,7 +820,8 @@
             mesh: null,
             clusters: [],
             hoveredFaceId: null,
-            selectedClusterId: null,
+            selectedCluster: null,
+            meshGroup: null,
         };
 
         // Three.js setup
@@ -765,12 +969,17 @@
         }
 
         function setSelectedCluster(clusterId) {
-            state.selectedClusterId = clusterId;
+            state.selectedCluster = clusterId;
             updateHighlights();
 
             // Highlight UV panel
             document.querySelectorAll('.uv-panel').forEach(panel => {
                 panel.classList.toggle('selected', panel.dataset.cluster == clusterId);
+            });
+
+            // Highlight cluster list item
+            document.querySelectorAll('.cluster-item').forEach(item => {
+                item.classList.toggle('selected', item.dataset.cluster == clusterId);
             });
         }
 
@@ -792,7 +1001,7 @@
                     color = new THREE.Color(0xffff00);
                 }
                 // Highlight selected cluster
-                else if (clusterId === state.selectedClusterId) {
+                else if (clusterId === state.selectedCluster) {
                     color = baseColor.clone().multiplyScalar(1.3);
                 }
 
@@ -872,6 +1081,7 @@
 
             meshObject = new THREE.Mesh(geometry, material);
             scene.add(meshObject);
+            state.meshGroup = meshObject;  // Store reference for highlighting
 
             // Center camera on mesh
             const box = new THREE.Box3().setFromObject(meshObject);
@@ -883,12 +1093,26 @@
             controls.target.copy(center);
             controls.update();
 
-            // Render UV panels
+            // Render clusters list and UV panels
+            renderClustersList(clusters);
             renderUVPanels(clusters);
         }
 
         function renderUVPanels(clusters) {
-            const container = document.getElementById('uv-panels');
+            const container = document.getElementById('uv-panels-grid');
+            const countEl = document.getElementById('uv-panels-count');
+
+            // Count clusters with UV data
+            const uvClusters = clusters.filter(c => c.uv_vertices);
+            countEl.textContent = `${uvClusters.length} panels`;
+
+            // Use single column if few clusters
+            if (uvClusters.length <= 3) {
+                container.classList.add('single-column');
+            } else {
+                container.classList.remove('single-column');
+            }
+
             container.innerHTML = '';
 
             clusters.forEach((cluster, idx) => {
@@ -898,15 +1122,22 @@
                 panel.className = 'uv-panel';
                 panel.dataset.cluster = idx;
 
+                // Calculate size info
+                const bbox = cluster.bbox;
+                const width = bbox ? (bbox.max[0] - bbox.min[0]).toFixed(1) : '?';
+                const height = bbox ? (bbox.max[1] - bbox.min[1]).toFixed(1) : '?';
+
                 panel.innerHTML = `
                     <div class="uv-panel-header">
-                        <span>Cluster ${idx}</span>
-                        <span>${cluster.face_ids.length} faces</span>
+                        <span class="cluster-label">
+                            <span class="cluster-dot" style="background: ${cluster.color}"></span>
+                            C${idx}
+                        </span>
+                        <span class="size-info">${width}×${height}</span>
                     </div>
                 `;
 
                 // Get bbox for normalizing UV coords (now in 3D units, not 0-1)
-                const bbox = cluster.bbox;
                 const bboxMinX = bbox ? bbox.min[0] : 0;
                 const bboxMinY = bbox ? bbox.min[1] : 0;
                 const bboxW = bbox ? (bbox.max[0] - bbox.min[0]) : 1;
@@ -1586,8 +1817,77 @@
             }
         });
 
-        function setStatus(text) {
+        function setStatus(text, stats = '') {
             document.getElementById('status-text').innerHTML = `<span class="info">${text}</span>`;
+            document.getElementById('status-stats').textContent = stats;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
+        }
+
+        function renderClustersList(clusters) {
+            const container = document.getElementById('clusters-list');
+            if (!clusters || clusters.length === 0) {
+                container.innerHTML = '<p style="color: #555; font-size: 12px; text-align: center; padding: 20px 0;">Run clustering to see clusters</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            clusters.forEach((cluster, idx) => {
+                const item = document.createElement('div');
+                item.className = 'cluster-item';
+                item.dataset.cluster = idx;
+                if (state.selectedCluster === idx) {
+                    item.classList.add('selected');
+                }
+
+                const faceCount = cluster.face_ids ? cluster.face_ids.length : 0;
+                const metrics = cluster.metrics || {};
+                const surfaceArea = metrics.surface_area_3d ? metrics.surface_area_3d.toFixed(2) : '–';
+
+                item.innerHTML = `
+                    <div class="cluster-color" style="background: ${cluster.color || '#666'}"></div>
+                    <div class="cluster-info">
+                        <div class="name">Cluster ${idx}</div>
+                        <div class="details">${faceCount} faces</div>
+                    </div>
+                    <div class="cluster-stats">
+                        ${surfaceArea} sq
+                    </div>
+                `;
+
+                item.addEventListener('click', () => setSelectedCluster(idx));
+                item.addEventListener('mouseenter', () => highlightCluster3D(idx, true));
+                item.addEventListener('mouseleave', () => highlightCluster3D(idx, false));
+
+                container.appendChild(item);
+            });
+        }
+
+        function highlightCluster3D(clusterIdx, highlight) {
+            if (!state.meshGroup || !state.clusters) return;
+            const cluster = state.clusters[clusterIdx];
+            if (!cluster) return;
+
+            state.meshGroup.traverse(child => {
+                if (child.isMesh && child.geometry) {
+                    const colors = child.geometry.attributes.color;
+                    if (!colors) return;
+
+                    cluster.face_ids.forEach(faceId => {
+                        const color = highlight
+                            ? new THREE.Color(0xffff00)  // Highlight yellow
+                            : new THREE.Color(cluster.color);
+
+                        for (let v = 0; v < 3; v++) {
+                            colors.setXYZ(faceId * 3 + v, color.r, color.g, color.b);
+                        }
+                    });
+                    colors.needsUpdate = true;
+                }
+            });
         }
 
         // Event handlers
