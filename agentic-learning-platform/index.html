@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Learning Platform - Master AI Agent Design Patterns</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">🤖</span>
+                <span class="logo-text">AgentLab</span>
+            </a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#patterns" class="nav-link">Patterns</a></li>
+                <li><a href="#examples" class="nav-link">Examples</a></li>
+                <li><a href="#tutorials" class="nav-link">Tutorials</a></li>
+                <li><a href="#playground" class="nav-link">Playground</a></li>
+                <li><a href="#resources" class="nav-link">Resources</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-bg">
+            <div class="hero-grid"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">Open Source Learning Platform</div>
+            <h1 class="hero-title">
+                Master <span class="gradient-text">Agentic AI</span> Design Patterns
+            </h1>
+            <p class="hero-subtitle">
+                Learn to build intelligent agents that reason, plan, and act.
+                From simple tool-calling to complex multi-agent orchestration.
+            </p>
+            <div class="hero-cta">
+                <a href="#patterns" class="btn btn-primary">Explore Patterns</a>
+                <a href="#tutorials" class="btn btn-secondary">Start Learning</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">7+</span>
+                    <span class="stat-label">Core Patterns</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Code Examples</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">Learning Paths</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Overview Section -->
+    <section class="overview-section" id="overview">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Overview</span>
+                <h2>What are AI Agents?</h2>
+                <p>Autonomous systems that perceive, reason, plan, and act to achieve goals</p>
+            </div>
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="card-icon">🧠</div>
+                    <h3>Reasoning</h3>
+                    <p>Agents think through problems step-by-step, breaking complex tasks into manageable pieces.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">🔧</div>
+                    <h3>Tool Use</h3>
+                    <p>Execute actions in the real world by calling APIs, searching the web, or running code.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">📋</div>
+                    <h3>Planning</h3>
+                    <p>Create and adapt strategies to accomplish goals, handling unexpected obstacles.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon">🔄</div>
+                    <h3>Iteration</h3>
+                    <p>Learn from feedback and refine approaches until objectives are achieved.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Patterns Section (List View) -->
+    <section class="patterns-section" id="patterns">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Core Concepts</span>
+                <h2>Agentic Design Patterns</h2>
+                <p>Essential architectural patterns for building intelligent agents</p>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">All Patterns</button>
+                <button class="filter-btn" data-filter="foundational">Foundational</button>
+                <button class="filter-btn" data-filter="advanced">Advanced</button>
+                <button class="filter-btn" data-filter="multi-agent">Multi-Agent</button>
+            </div>
+
+            <div class="patterns-list">
+                <!-- Pattern 1: ReAct -->
+                <article class="pattern-card" data-category="foundational" id="pattern-react">
+                    <div class="pattern-header">
+                        <div class="pattern-icon react-icon">⚡</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Foundational</span>
+                            <span class="pattern-difficulty">Beginner</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">ReAct (Reason + Act)</h3>
+                    <p class="pattern-description">
+                        The ReAct pattern alternates between reasoning about what to do next and actually doing it.
+                        This creates an adaptive problem-solving loop where the agent thinks, acts, observes, and repeats.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Think</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Act</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Observe</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Repeat</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Adaptive to changing conditions</li>
+                                <li>Transparent reasoning trace</li>
+                                <li>Handles unexpected situations</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Higher latency (multiple LLM calls)</li>
+                                <li>Error propagation risk</li>
+                                <li>Depends on model quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>smolagents Implementation</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, InferenceClientModel
+from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
+
+# ReAct agent with search capabilities
+model = InferenceClientModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct")
+
+agent = CodeAgent(
+    tools=[DuckDuckGoSearchTool(), VisitWebpageTool()],
+    model=model,
+    max_steps=10  # Maximum reasoning iterations
+)
+
+# The agent will reason, search, observe results, and iterate
+result = agent.run(
+    "Find the latest news about AI agents and summarize the key trends"
+)
+print(result)</code></pre>
+                    </div>
+                    <a href="#tutorial-react" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 2: Tool Use -->
+                <article class="pattern-card" data-category="foundational" id="pattern-tool-use">
+                    <div class="pattern-header">
+                        <div class="pattern-icon tool-icon">🔧</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Foundational</span>
+                            <span class="pattern-difficulty">Beginner</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Tool Use</h3>
+                    <p class="pattern-description">
+                        Extend agent capabilities beyond text generation by connecting to external tools,
+                        APIs, and systems. Tools let agents retrieve data, execute code, and interact with the world.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Parse Intent</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Select Tool</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Execute</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Process Result</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Access real-time information</li>
+                                <li>Perform actual computations</li>
+                                <li>Integrate with existing systems</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Security considerations</li>
+                                <li>Tool selection complexity</li>
+                                <li>Error handling required</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>Custom Tool Definition</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import Tool, CodeAgent, InferenceClientModel
+
+class WeatherTool(Tool):
+    name = "weather_lookup"
+    description = "Get current weather for a city"
+    inputs = {
+        "city": {
+            "type": "string",
+            "description": "The city name to look up weather for"
+        }
+    }
+    output_type = "string"
+
+    def forward(self, city: str) -> str:
+        # In production, call a real weather API
+        return f"Weather in {city}: 72°F, Sunny"
+
+# Use the custom tool
+agent = CodeAgent(
+    tools=[WeatherTool()],
+    model=InferenceClientModel()
+)
+
+result = agent.run("What's the weather like in San Francisco?")</code></pre>
+                    </div>
+                    <a href="#tutorial-tools" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 3: Planning -->
+                <article class="pattern-card" data-category="advanced" id="pattern-planning">
+                    <div class="pattern-header">
+                        <div class="pattern-icon planning-icon">📋</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Advanced</span>
+                            <span class="pattern-difficulty">Intermediate</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Planning Pattern</h3>
+                    <p class="pattern-description">
+                        Before execution, create a comprehensive plan that breaks down complex goals into
+                        actionable tasks. Useful for multi-step workflows where strategic thinking improves outcomes.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Analyze Goal</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Create Plan</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Execute Steps</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Adapt</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Better for complex workflows</li>
+                                <li>Easier debugging & monitoring</li>
+                                <li>Can use different models per step</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Upfront planning overhead</li>
+                                <li>Plans may need revision</li>
+                                <li>More complex implementation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>Planning with smolagents</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, InferenceClientModel
+
+# Enable planning mode for complex tasks
+model = InferenceClientModel(model_id="Qwen/Qwen2.5-72B-Instruct")
+
+agent = CodeAgent(
+    tools=[],
+    model=model,
+    planning_interval=3  # Re-plan every 3 steps
+)
+
+# Complex task that benefits from planning
+result = agent.run("""
+    Create a comprehensive analysis of the top 5 programming languages in 2024:
+    1. Research popularity metrics
+    2. Compare performance characteristics
+    3. Analyze job market demand
+    4. Summarize pros and cons
+    5. Provide recommendations for different use cases
+""")</code></pre>
+                    </div>
+                    <a href="#tutorial-planning" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 4: Code Generation -->
+                <article class="pattern-card" data-category="advanced" id="pattern-code-agent">
+                    <div class="pattern-header">
+                        <div class="pattern-icon code-icon">💻</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Advanced</span>
+                            <span class="pattern-difficulty">Intermediate</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Code Agent</h3>
+                    <p class="pattern-description">
+                        Instead of outputting JSON tool calls, write executable Python code to accomplish tasks.
+                        This enables natural composability with loops, conditionals, and function composition.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Understand Task</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Generate Code</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Execute Safely</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Return Result</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Natural composability</li>
+                                <li>Complex logic support</li>
+                                <li>Leverages coding capabilities</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Requires sandboxing</li>
+                                <li>Execution security concerns</li>
+                                <li>Debugging complexity</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>CodeAgent vs ToolCallingAgent</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, ToolCallingAgent, InferenceClientModel
+
+model = InferenceClientModel()
+
+# CodeAgent: Writes Python to solve problems
+code_agent = CodeAgent(tools=[], model=model)
+
+# The agent writes actual Python code like:
+# numbers = [1, 2, 3, 4, 5]
+# result = sum(n**2 for n in numbers)
+# print(result)
+result = code_agent.run("Calculate the sum of squares from 1 to 100")
+
+# ToolCallingAgent: Uses JSON-based tool calls
+tool_agent = ToolCallingAgent(tools=[], model=model)
+
+# Better for structured tool interactions
+# Outputs: {"tool": "calculator", "args": {"expression": "..."}}
+result = tool_agent.run("What is 15% of 847?")</code></pre>
+                    </div>
+                    <a href="#tutorial-code-agent" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 5: Memory -->
+                <article class="pattern-card" data-category="advanced" id="pattern-memory">
+                    <div class="pattern-header">
+                        <div class="pattern-icon memory-icon">🧠</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Advanced</span>
+                            <span class="pattern-difficulty">Intermediate</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Memory Systems</h3>
+                    <p class="pattern-description">
+                        Enable agents to remember past interactions, learned information, and context across sessions.
+                        Includes short-term (conversation) and long-term (persistent) memory patterns.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Receive Input</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Query Memory</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Process</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Update Memory</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Contextual awareness</li>
+                                <li>Learning from experience</li>
+                                <li>Personalization</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Storage requirements</li>
+                                <li>Retrieval accuracy</li>
+                                <li>Privacy concerns</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>Memory-Enabled Agent</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, InferenceClientModel
+
+# Conversation memory is built into smolagents
+model = InferenceClientModel()
+agent = CodeAgent(tools=[], model=model)
+
+# First interaction
+result1 = agent.run("My name is Alice and I'm learning Python")
+
+# Agent remembers context from previous turns
+result2 = agent.run("What programming concepts should I focus on?")
+# Agent knows you're Alice and learning Python!
+
+# For long-term memory, integrate with vector stores
+from langchain.vectorstores import Chroma
+
+class MemoryTool(Tool):
+    name = "memory_store"
+    description = "Store and retrieve information from long-term memory"
+
+    def forward(self, action: str, content: str) -> str:
+        if action == "store":
+            self.vectorstore.add_texts([content])
+            return "Stored in memory"
+        elif action == "retrieve":
+            docs = self.vectorstore.similarity_search(content, k=3)
+            return "\n".join(d.page_content for d in docs)</code></pre>
+                    </div>
+                    <a href="#tutorial-memory" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 6: Reflection -->
+                <article class="pattern-card" data-category="advanced" id="pattern-reflection">
+                    <div class="pattern-header">
+                        <div class="pattern-icon reflection-icon">🔍</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Advanced</span>
+                            <span class="pattern-difficulty">Advanced</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Reflection & Self-Critique</h3>
+                    <p class="pattern-description">
+                        Agents evaluate their own outputs, identify errors, and iteratively improve.
+                        This pattern enables self-correction and quality assurance without human intervention.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Generate</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Evaluate</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Critique</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Refine</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Self-correcting outputs</li>
+                                <li>Higher quality results</li>
+                                <li>Catches errors autonomously</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Increased latency</li>
+                                <li>Higher token costs</li>
+                                <li>May over-critique</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>Self-Reflection Pattern</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, InferenceClientModel
+
+model = InferenceClientModel()
+
+# Create a reflection-enabled workflow
+def generate_with_reflection(agent, task, max_iterations=3):
+    # Initial generation
+    result = agent.run(task)
+
+    for i in range(max_iterations):
+        # Self-critique
+        critique = agent.run(f"""
+            Review this output and identify any issues:
+            {result}
+
+            List specific problems or improvements needed.
+            If the output is good, respond with 'APPROVED'.
+        """)
+
+        if "APPROVED" in critique:
+            break
+
+        # Refine based on critique
+        result = agent.run(f"""
+            Improve this based on the feedback:
+            Original: {result}
+            Feedback: {critique}
+        """)
+
+    return result
+
+agent = CodeAgent(tools=[], model=model)
+final_result = generate_with_reflection(
+    agent,
+    "Write a Python function to validate email addresses"
+)</code></pre>
+                    </div>
+                    <a href="#tutorial-reflection" class="pattern-link">View Full Tutorial →</a>
+                </article>
+
+                <!-- Pattern 7: Multi-Agent -->
+                <article class="pattern-card" data-category="multi-agent" id="pattern-multi-agent">
+                    <div class="pattern-header">
+                        <div class="pattern-icon multi-icon">👥</div>
+                        <div class="pattern-meta">
+                            <span class="pattern-category">Multi-Agent</span>
+                            <span class="pattern-difficulty">Advanced</span>
+                        </div>
+                    </div>
+                    <h3 class="pattern-title">Multi-Agent Collaboration</h3>
+                    <p class="pattern-description">
+                        Multiple specialized agents work together, each focusing on specific tasks.
+                        Enables division of labor, expertise specialization, and parallel processing.
+                    </p>
+                    <div class="pattern-flow">
+                        <div class="flow-step">Orchestrator</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Delegate</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Specialists</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Aggregate</div>
+                    </div>
+                    <div class="pattern-pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                <li>Specialized expertise</li>
+                                <li>Parallel execution</li>
+                                <li>Modular design</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Trade-offs</h4>
+                            <ul>
+                                <li>Coordination overhead</li>
+                                <li>Communication complexity</li>
+                                <li>Harder to debug</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pattern-code">
+                        <div class="code-header">
+                            <span>Multi-Agent System</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from smolagents import CodeAgent, InferenceClientModel, ManagedAgent
+
+model = InferenceClientModel()
+
+# Create specialized agents
+research_agent = CodeAgent(
+    tools=[DuckDuckGoSearchTool()],
+    model=model,
+    name="researcher",
+    description="Searches the web for information"
+)
+
+writer_agent = CodeAgent(
+    tools=[],
+    model=model,
+    name="writer",
+    description="Writes and formats content"
+)
+
+# Manager agent that delegates to specialists
+manager = CodeAgent(
+    tools=[],
+    model=model,
+    managed_agents=[
+        ManagedAgent(agent=research_agent, name="researcher"),
+        ManagedAgent(agent=writer_agent, name="writer")
+    ]
+)
+
+# Manager coordinates the workflow
+result = manager.run("""
+    Create a blog post about AI agents:
+    1. Use researcher to find recent developments
+    2. Use writer to create an engaging article
+""")</code></pre>
+                    </div>
+                    <a href="#tutorial-multi-agent" class="pattern-link">View Full Tutorial →</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Gallery Section -->
+    <section class="examples-section" id="examples">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Practical</span>
+                <h2>Code Examples Gallery</h2>
+                <p>Ready-to-use implementations with smolagents</p>
+            </div>
+
+            <div class="examples-filter">
+                <button class="example-filter-btn active" data-filter="all">All Examples</button>
+                <button class="example-filter-btn" data-filter="beginner">Beginner</button>
+                <button class="example-filter-btn" data-filter="intermediate">Intermediate</button>
+                <button class="example-filter-btn" data-filter="advanced">Advanced</button>
+            </div>
+
+            <div class="examples-grid">
+                <!-- Example 1 -->
+                <div class="example-card" data-level="beginner">
+                    <div class="example-header">
+                        <span class="example-number">01</span>
+                        <span class="example-level beginner">Beginner</span>
+                    </div>
+                    <h3>Hello World Agent</h3>
+                    <p>Your first agent in 5 lines of code</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, InferenceClientModel
+
+agent = CodeAgent(
+    tools=[],
+    model=InferenceClientModel()
+)
+
+result = agent.run("What is 2 + 2?")
+print(result)  # 4</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">basics</span>
+                        <span class="tag">setup</span>
+                    </div>
+                </div>
+
+                <!-- Example 2 -->
+                <div class="example-card" data-level="beginner">
+                    <div class="example-header">
+                        <span class="example-number">02</span>
+                        <span class="example-level beginner">Beginner</span>
+                    </div>
+                    <h3>Web Search Agent</h3>
+                    <p>Agent that searches the internet</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import (
+    CodeAgent,
+    InferenceClientModel,
+    DuckDuckGoSearchTool
+)
+
+agent = CodeAgent(
+    tools=[DuckDuckGoSearchTool()],
+    model=InferenceClientModel()
+)
+
+result = agent.run(
+    "What are the latest AI news today?"
+)
+print(result)</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">search</span>
+                        <span class="tag">web</span>
+                        <span class="tag">tools</span>
+                    </div>
+                </div>
+
+                <!-- Example 3 -->
+                <div class="example-card" data-level="beginner">
+                    <div class="example-header">
+                        <span class="example-number">03</span>
+                        <span class="example-level beginner">Beginner</span>
+                    </div>
+                    <h3>Image Generation Agent</h3>
+                    <p>Create images from text prompts</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import (
+    CodeAgent,
+    InferenceClientModel,
+    load_tool
+)
+
+# Load image generation tool
+image_tool = load_tool(
+    "m-ric/text-to-image",
+    trust_remote_code=True
+)
+
+agent = CodeAgent(
+    tools=[image_tool],
+    model=InferenceClientModel()
+)
+
+image = agent.run(
+    "Generate a futuristic cityscape"
+)</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">image</span>
+                        <span class="tag">generation</span>
+                        <span class="tag">multimodal</span>
+                    </div>
+                </div>
+
+                <!-- Example 4 -->
+                <div class="example-card" data-level="intermediate">
+                    <div class="example-header">
+                        <span class="example-number">04</span>
+                        <span class="example-level intermediate">Intermediate</span>
+                    </div>
+                    <h3>Custom Tool Creation</h3>
+                    <p>Build your own agent tools</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import Tool, CodeAgent
+
+class CalculatorTool(Tool):
+    name = "calculator"
+    description = "Evaluate math expressions"
+    inputs = {
+        "expression": {
+            "type": "string",
+            "description": "Math expression"
+        }
+    }
+    output_type = "number"
+
+    def forward(self, expression: str):
+        # Safe evaluation
+        return eval(expression, {"__builtins__": {}})
+
+agent = CodeAgent(tools=[CalculatorTool()])
+result = agent.run("Calculate 15 * 23 + 7")</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">custom</span>
+                        <span class="tag">tools</span>
+                        <span class="tag">extensibility</span>
+                    </div>
+                </div>
+
+                <!-- Example 5 -->
+                <div class="example-card" data-level="intermediate">
+                    <div class="example-header">
+                        <span class="example-number">05</span>
+                        <span class="example-level intermediate">Intermediate</span>
+                    </div>
+                    <h3>File Processing Agent</h3>
+                    <p>Read and analyze files</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import Tool, CodeAgent
+import pandas as pd
+
+class CSVAnalyzerTool(Tool):
+    name = "csv_analyzer"
+    description = "Analyze CSV files"
+    inputs = {
+        "filepath": {"type": "string"},
+        "query": {"type": "string"}
+    }
+    output_type = "string"
+
+    def forward(self, filepath, query):
+        df = pd.read_csv(filepath)
+        if query == "summary":
+            return df.describe().to_string()
+        elif query == "columns":
+            return str(df.columns.tolist())
+        return df.head(10).to_string()
+
+agent = CodeAgent(tools=[CSVAnalyzerTool()])</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">files</span>
+                        <span class="tag">data</span>
+                        <span class="tag">analysis</span>
+                    </div>
+                </div>
+
+                <!-- Example 6 -->
+                <div class="example-card" data-level="intermediate">
+                    <div class="example-header">
+                        <span class="example-number">06</span>
+                        <span class="example-level intermediate">Intermediate</span>
+                    </div>
+                    <h3>API Integration Agent</h3>
+                    <p>Connect to external APIs</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import Tool, CodeAgent
+import requests
+
+class GitHubTool(Tool):
+    name = "github_api"
+    description = "Query GitHub repositories"
+    inputs = {
+        "repo": {"type": "string"},
+        "action": {"type": "string"}
+    }
+    output_type = "string"
+
+    def forward(self, repo, action):
+        url = f"https://api.github.com/repos/{repo}"
+        if action == "stars":
+            r = requests.get(url)
+            return f"Stars: {r.json()['stargazers_count']}"
+        elif action == "issues":
+            r = requests.get(f"{url}/issues")
+            return f"Open issues: {len(r.json())}"
+
+agent = CodeAgent(tools=[GitHubTool()])</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">api</span>
+                        <span class="tag">github</span>
+                        <span class="tag">integration</span>
+                    </div>
+                </div>
+
+                <!-- Example 7 -->
+                <div class="example-card" data-level="intermediate">
+                    <div class="example-header">
+                        <span class="example-number">07</span>
+                        <span class="example-level intermediate">Intermediate</span>
+                    </div>
+                    <h3>Different LLM Providers</h3>
+                    <p>Use OpenAI, Anthropic, or local models</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, LiteLLMModel
+
+# OpenAI
+openai_agent = CodeAgent(
+    tools=[],
+    model=LiteLLMModel(model_id="gpt-4o")
+)
+
+# Anthropic Claude
+claude_agent = CodeAgent(
+    tools=[],
+    model=LiteLLMModel(model_id="claude-3-5-sonnet")
+)
+
+# Local Ollama
+ollama_agent = CodeAgent(
+    tools=[],
+    model=LiteLLMModel(model_id="ollama/llama3.2")
+)
+
+# Each agent uses a different backend
+result = claude_agent.run("Explain quantum computing")</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">providers</span>
+                        <span class="tag">openai</span>
+                        <span class="tag">anthropic</span>
+                    </div>
+                </div>
+
+                <!-- Example 8 -->
+                <div class="example-card" data-level="advanced">
+                    <div class="example-header">
+                        <span class="example-number">08</span>
+                        <span class="example-level advanced">Advanced</span>
+                    </div>
+                    <h3>Sandboxed Execution</h3>
+                    <p>Secure code execution environments</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, InferenceClientModel
+from smolagents.sandbox import E2BSandbox
+
+# Create sandboxed environment
+sandbox = E2BSandbox()
+
+agent = CodeAgent(
+    tools=[],
+    model=InferenceClientModel(),
+    sandbox=sandbox  # Execute in isolated env
+)
+
+# Safely run potentially risky code
+result = agent.run("""
+    Write and execute a Python script that:
+    1. Creates a test file
+    2. Writes data to it
+    3. Reads and returns the contents
+""")
+
+# Sandbox prevents access to host system</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">security</span>
+                        <span class="tag">sandbox</span>
+                        <span class="tag">isolation</span>
+                    </div>
+                </div>
+
+                <!-- Example 9 -->
+                <div class="example-card" data-level="advanced">
+                    <div class="example-header">
+                        <span class="example-number">09</span>
+                        <span class="example-level advanced">Advanced</span>
+                    </div>
+                    <h3>Gradio UI Integration</h3>
+                    <p>Build interactive agent interfaces</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, InferenceClientModel
+from smolagents import GradioUI
+
+agent = CodeAgent(
+    tools=[DuckDuckGoSearchTool()],
+    model=InferenceClientModel()
+)
+
+# Launch interactive web interface
+GradioUI(agent).launch()
+
+# Or deploy to Hugging Face Spaces
+# with share=True for public URL</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">ui</span>
+                        <span class="tag">gradio</span>
+                        <span class="tag">deployment</span>
+                    </div>
+                </div>
+
+                <!-- Example 10 -->
+                <div class="example-card" data-level="advanced">
+                    <div class="example-header">
+                        <span class="example-number">10</span>
+                        <span class="example-level advanced">Advanced</span>
+                    </div>
+                    <h3>Multi-Agent Research Team</h3>
+                    <p>Coordinate specialized agents</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, ManagedAgent
+
+# Specialist agents
+researcher = CodeAgent(
+    tools=[DuckDuckGoSearchTool()],
+    model=model,
+    name="researcher"
+)
+
+analyst = CodeAgent(
+    tools=[],
+    model=model,
+    name="analyst"
+)
+
+# Manager coordinates the team
+manager = CodeAgent(
+    tools=[],
+    model=model,
+    managed_agents=[
+        ManagedAgent(researcher, "researcher"),
+        ManagedAgent(analyst, "analyst")
+    ]
+)
+
+result = manager.run("""
+    Research AI trends and provide analysis
+""")</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">multi-agent</span>
+                        <span class="tag">orchestration</span>
+                        <span class="tag">teamwork</span>
+                    </div>
+                </div>
+
+                <!-- Example 11 -->
+                <div class="example-card" data-level="advanced">
+                    <div class="example-header">
+                        <span class="example-number">11</span>
+                        <span class="example-level advanced">Advanced</span>
+                    </div>
+                    <h3>Vision Agent</h3>
+                    <p>Analyze images and visual content</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import CodeAgent, InferenceClientModel
+from PIL import Image
+
+# Use a vision-capable model
+model = InferenceClientModel(
+    model_id="meta-llama/Llama-3.2-11B-Vision-Instruct"
+)
+
+agent = CodeAgent(tools=[], model=model)
+
+# Load and analyze an image
+image = Image.open("diagram.png")
+
+result = agent.run(
+    "Describe this architecture diagram",
+    images=[image]
+)
+
+print(result)</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">vision</span>
+                        <span class="tag">multimodal</span>
+                        <span class="tag">images</span>
+                    </div>
+                </div>
+
+                <!-- Example 12 -->
+                <div class="example-card" data-level="advanced">
+                    <div class="example-header">
+                        <span class="example-number">12</span>
+                        <span class="example-level advanced">Advanced</span>
+                    </div>
+                    <h3>RAG Agent</h3>
+                    <p>Retrieval-augmented generation</p>
+                    <div class="example-code">
+                        <pre><code>from smolagents import Tool, CodeAgent
+from langchain.vectorstores import FAISS
+from langchain.embeddings import OpenAIEmbeddings
+
+class RAGTool(Tool):
+    name = "knowledge_base"
+    description = "Search internal documents"
+    inputs = {"query": {"type": "string"}}
+    output_type = "string"
+
+    def __init__(self, documents):
+        self.vectorstore = FAISS.from_texts(
+            documents, OpenAIEmbeddings()
+        )
+
+    def forward(self, query):
+        docs = self.vectorstore.similarity_search(query)
+        return "\n".join(d.page_content for d in docs)
+
+rag_tool = RAGTool(["doc1...", "doc2..."])
+agent = CodeAgent(tools=[rag_tool])</code></pre>
+                    </div>
+                    <div class="example-tags">
+                        <span class="tag">rag</span>
+                        <span class="tag">retrieval</span>
+                        <span class="tag">knowledge</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tutorials Section -->
+    <section class="tutorials-section" id="tutorials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Learn</span>
+                <h2>Learning Paths</h2>
+                <p>Structured tutorials from beginner to advanced</p>
+            </div>
+
+            <div class="learning-paths">
+                <!-- Path 1: Getting Started -->
+                <div class="learning-path" id="path-beginner">
+                    <div class="path-header">
+                        <div class="path-icon">🚀</div>
+                        <div class="path-info">
+                            <h3>Getting Started</h3>
+                            <p>Foundation for building AI agents</p>
+                            <div class="path-meta">
+                                <span class="path-duration">~2 hours</span>
+                                <span class="path-level">Beginner</span>
+                            </div>
+                        </div>
+                        <div class="path-progress">
+                            <div class="progress-ring" data-progress="0">
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="path-modules">
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>1. What are AI Agents?</h4>
+                                <p>Understanding autonomous AI systems that reason and act</p>
+                                <ul class="module-topics">
+                                    <li>Agent vs ChatBot: Key differences</li>
+                                    <li>The perception-reasoning-action loop</li>
+                                    <li>When to use agents vs simple prompting</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">15 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>2. Setting Up smolagents</h4>
+                                <p>Installation and configuration</p>
+                                <ul class="module-topics">
+                                    <li>Installing the library</li>
+                                    <li>Configuring model access</li>
+                                    <li>Your first "Hello World" agent</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">20 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>3. Understanding CodeAgent</h4>
+                                <p>How agents write and execute code</p>
+                                <ul class="module-topics">
+                                    <li>Code generation vs tool calling</li>
+                                    <li>The agent execution loop</li>
+                                    <li>Reading agent traces</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">25 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>4. Using Built-in Tools</h4>
+                                <p>Search, browse, and generate</p>
+                                <ul class="module-topics">
+                                    <li>DuckDuckGoSearchTool for web search</li>
+                                    <li>VisitWebpageTool for content extraction</li>
+                                    <li>Combining multiple tools</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">30 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path 2: Building Custom Tools -->
+                <div class="learning-path" id="path-tools">
+                    <div class="path-header">
+                        <div class="path-icon">🔧</div>
+                        <div class="path-info">
+                            <h3>Building Custom Tools</h3>
+                            <p>Extend agent capabilities</p>
+                            <div class="path-meta">
+                                <span class="path-duration">~3 hours</span>
+                                <span class="path-level">Intermediate</span>
+                            </div>
+                        </div>
+                        <div class="path-progress">
+                            <div class="progress-ring" data-progress="0">
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="path-modules">
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>1. Tool Architecture</h4>
+                                <p>Understanding the Tool class</p>
+                                <ul class="module-topics">
+                                    <li>Tool class structure and methods</li>
+                                    <li>Input/output specifications</li>
+                                    <li>Tool descriptions for the LLM</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">25 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>2. Creating Your First Tool</h4>
+                                <p>Build a weather lookup tool</p>
+                                <ul class="module-topics">
+                                    <li>Defining inputs and outputs</li>
+                                    <li>Implementing the forward method</li>
+                                    <li>Error handling best practices</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">30 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>3. API Integration Tools</h4>
+                                <p>Connect to external services</p>
+                                <ul class="module-topics">
+                                    <li>RESTful API tools</li>
+                                    <li>Authentication handling</li>
+                                    <li>Rate limiting and retries</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">40 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>4. Database Tools</h4>
+                                <p>Query and manipulate data</p>
+                                <ul class="module-topics">
+                                    <li>SQL query tools</li>
+                                    <li>Vector database integration</li>
+                                    <li>Safe query construction</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">35 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>5. Sharing Tools on Hub</h4>
+                                <p>Publish and reuse tools</p>
+                                <ul class="module-topics">
+                                    <li>Packaging tools for sharing</li>
+                                    <li>Loading tools from Hub</li>
+                                    <li>Tool versioning</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">20 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path 3: Advanced Patterns -->
+                <div class="learning-path" id="path-advanced">
+                    <div class="path-header">
+                        <div class="path-icon">🎯</div>
+                        <div class="path-info">
+                            <h3>Advanced Agent Patterns</h3>
+                            <p>Master complex architectures</p>
+                            <div class="path-meta">
+                                <span class="path-duration">~4 hours</span>
+                                <span class="path-level">Advanced</span>
+                            </div>
+                        </div>
+                        <div class="path-progress">
+                            <div class="progress-ring" data-progress="0">
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="path-modules">
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>1. ReAct Deep Dive</h4>
+                                <p>Master reasoning and acting</p>
+                                <ul class="module-topics">
+                                    <li>ReAct loop internals</li>
+                                    <li>Optimizing step counts</li>
+                                    <li>Handling reasoning failures</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">35 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>2. Planning Strategies</h4>
+                                <p>Upfront vs adaptive planning</p>
+                                <ul class="module-topics">
+                                    <li>Plan-then-execute patterns</li>
+                                    <li>Dynamic replanning</li>
+                                    <li>Hierarchical task decomposition</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">40 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>3. Multi-Agent Systems</h4>
+                                <p>Orchestrating agent teams</p>
+                                <ul class="module-topics">
+                                    <li>Manager-worker patterns</li>
+                                    <li>Agent communication protocols</li>
+                                    <li>Conflict resolution</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">50 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>4. Memory & State</h4>
+                                <p>Persistent agent memory</p>
+                                <ul class="module-topics">
+                                    <li>Short-term conversation memory</li>
+                                    <li>Long-term vector store memory</li>
+                                    <li>Episodic vs semantic memory</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">45 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>5. Reflection & Self-Improvement</h4>
+                                <p>Self-critiquing agents</p>
+                                <ul class="module-topics">
+                                    <li>Output evaluation strategies</li>
+                                    <li>Iterative refinement loops</li>
+                                    <li>Learning from mistakes</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">35 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path 4: Production Deployment -->
+                <div class="learning-path" id="path-production">
+                    <div class="path-header">
+                        <div class="path-icon">🏭</div>
+                        <div class="path-info">
+                            <h3>Production Deployment</h3>
+                            <p>Ship agents to production</p>
+                            <div class="path-meta">
+                                <span class="path-duration">~3 hours</span>
+                                <span class="path-level">Advanced</span>
+                            </div>
+                        </div>
+                        <div class="path-progress">
+                            <div class="progress-ring" data-progress="0">
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="path-modules">
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>1. Security & Sandboxing</h4>
+                                <p>Safe code execution</p>
+                                <ul class="module-topics">
+                                    <li>E2B sandbox integration</li>
+                                    <li>Docker isolation</li>
+                                    <li>Input validation</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">30 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>2. Observability</h4>
+                                <p>Monitor agent behavior</p>
+                                <ul class="module-topics">
+                                    <li>Logging agent traces</li>
+                                    <li>Performance metrics</li>
+                                    <li>Error tracking</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">25 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>3. Cost Optimization</h4>
+                                <p>Manage token usage</p>
+                                <ul class="module-topics">
+                                    <li>Model selection strategies</li>
+                                    <li>Caching responses</li>
+                                    <li>Prompt compression</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">30 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>4. Deployment Options</h4>
+                                <p>Host your agents</p>
+                                <ul class="module-topics">
+                                    <li>Hugging Face Spaces</li>
+                                    <li>Docker containers</li>
+                                    <li>Serverless functions</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">35 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path 5: Real-World Projects -->
+                <div class="learning-path" id="path-projects">
+                    <div class="path-header">
+                        <div class="path-icon">🛠️</div>
+                        <div class="path-info">
+                            <h3>Real-World Projects</h3>
+                            <p>Build complete agent applications</p>
+                            <div class="path-meta">
+                                <span class="path-duration">~6 hours</span>
+                                <span class="path-level">All Levels</span>
+                            </div>
+                        </div>
+                        <div class="path-progress">
+                            <div class="progress-ring" data-progress="0">
+                                <span>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="path-modules">
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>1. Research Assistant</h4>
+                                <p>Build an agent that researches topics</p>
+                                <ul class="module-topics">
+                                    <li>Web search and summarization</li>
+                                    <li>Source citation</li>
+                                    <li>Report generation</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">60 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>2. Code Review Agent</h4>
+                                <p>Automated code analysis</p>
+                                <ul class="module-topics">
+                                    <li>GitHub integration</li>
+                                    <li>Code quality analysis</li>
+                                    <li>Suggestion generation</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">75 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>3. Customer Support Bot</h4>
+                                <p>RAG-powered support agent</p>
+                                <ul class="module-topics">
+                                    <li>Knowledge base integration</li>
+                                    <li>Ticket handling</li>
+                                    <li>Escalation logic</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">90 min</span>
+                        </div>
+                        <div class="module">
+                            <div class="module-status"></div>
+                            <div class="module-content">
+                                <h4>4. Data Analysis Agent</h4>
+                                <p>Automated data insights</p>
+                                <ul class="module-topics">
+                                    <li>CSV/database querying</li>
+                                    <li>Visualization generation</li>
+                                    <li>Insight extraction</li>
+                                </ul>
+                            </div>
+                            <span class="module-time">75 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Playground Section -->
+    <section class="playground-section" id="playground">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Interactive</span>
+                <h2>Agent Playground</h2>
+                <p>Experiment with agent configurations</p>
+            </div>
+
+            <div class="playground-container">
+                <div class="playground-sidebar">
+                    <h3>Configuration</h3>
+
+                    <div class="config-group">
+                        <label>Agent Type</label>
+                        <select id="agent-type">
+                            <option value="code">CodeAgent</option>
+                            <option value="tool">ToolCallingAgent</option>
+                        </select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Model</label>
+                        <select id="model-select">
+                            <option value="qwen-coder">Qwen2.5-Coder-32B</option>
+                            <option value="llama">Llama-3.1-70B</option>
+                            <option value="gpt4">GPT-4o</option>
+                            <option value="claude">Claude 3.5 Sonnet</option>
+                        </select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Tools</label>
+                        <div class="tool-checkboxes">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="tool-search" checked>
+                                <span>Web Search</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="tool-browse">
+                                <span>Web Browser</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="tool-image">
+                                <span>Image Generation</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="tool-code">
+                                <span>Code Execution</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Max Steps</label>
+                        <input type="range" id="max-steps" min="1" max="20" value="10">
+                        <span class="range-value" id="steps-value">10</span>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Planning</label>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="enable-planning">
+                            <span class="toggle"></span>
+                            <span>Enable Planning</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="playground-main">
+                    <div class="code-preview">
+                        <div class="code-header">
+                            <span>Generated Code</span>
+                            <button class="copy-btn" onclick="copyPlaygroundCode()">Copy</button>
+                        </div>
+                        <pre id="playground-code"><code class="language-python">from smolagents import CodeAgent, InferenceClientModel
+from smolagents import DuckDuckGoSearchTool
+
+model = InferenceClientModel(
+    model_id="Qwen/Qwen2.5-Coder-32B-Instruct"
+)
+
+agent = CodeAgent(
+    tools=[DuckDuckGoSearchTool()],
+    model=model,
+    max_steps=10
+)
+
+# Run the agent
+result = agent.run("Your task here...")
+print(result)</code></pre>
+                    </div>
+
+                    <div class="task-input">
+                        <label>Task Prompt</label>
+                        <textarea id="task-prompt" placeholder="Describe the task for your agent...">Find the top 3 trending AI papers this week and summarize their key findings.</textarea>
+                    </div>
+
+                    <div class="playground-actions">
+                        <button class="btn btn-primary" onclick="updatePlaygroundCode()">Update Code</button>
+                        <a href="https://huggingface.co/learn/agents-course" target="_blank" class="btn btn-secondary">Try on HF Spaces</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table Section -->
+    <section class="comparison-section" id="comparison">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Reference</span>
+                <h2>Pattern Comparison</h2>
+                <p>Choose the right pattern for your use case</p>
+            </div>
+
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Best For</th>
+                            <th>Complexity</th>
+                            <th>Latency</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ReAct</strong></td>
+                            <td>Dynamic problem-solving, research tasks</td>
+                            <td><span class="level-badge low">Low</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tool Use</strong></td>
+                            <td>API integrations, data retrieval</td>
+                            <td><span class="level-badge low">Low</span></td>
+                            <td><span class="level-badge low">Low</span></td>
+                            <td><span class="level-badge low">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Planning</strong></td>
+                            <td>Complex multi-step workflows</td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Agent</strong></td>
+                            <td>Computational tasks, data processing</td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge low">Low</span></td>
+                            <td><span class="level-badge low">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reflection</strong></td>
+                            <td>Quality-critical outputs, writing</td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge high">High</span></td>
+                            <td><span class="level-badge high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multi-Agent</strong></td>
+                            <td>Complex systems, specialized tasks</td>
+                            <td><span class="level-badge high">High</span></td>
+                            <td><span class="level-badge high">High</span></td>
+                            <td><span class="level-badge high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory</strong></td>
+                            <td>Long conversations, personalization</td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                            <td><span class="level-badge medium">Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="decision-guide">
+                <h3>Quick Decision Guide</h3>
+                <div class="decision-cards">
+                    <div class="decision-card">
+                        <h4>Start Simple</h4>
+                        <p>Begin with a single agent using ReAct pattern and appropriate tools. This handles most real-world tasks effectively.</p>
+                    </div>
+                    <div class="decision-card">
+                        <h4>Add Complexity Gradually</h4>
+                        <p>Only add planning, reflection, or multi-agent patterns when single-agent approaches prove insufficient.</p>
+                    </div>
+                    <div class="decision-card">
+                        <h4>Consider Trade-offs</h4>
+                        <p>More sophisticated patterns increase latency and cost. Balance capability with performance requirements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources-section" id="resources">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Explore</span>
+                <h2>Resources & Links</h2>
+                <p>Continue your learning journey</p>
+            </div>
+
+            <div class="resources-grid">
+                <a href="https://huggingface.co/docs/smolagents" target="_blank" class="resource-card">
+                    <div class="resource-icon">📚</div>
+                    <h3>Official Documentation</h3>
+                    <p>Complete API reference and guides for smolagents</p>
+                    <span class="resource-link">huggingface.co/docs/smolagents →</span>
+                </a>
+
+                <a href="https://github.com/huggingface/smolagents" target="_blank" class="resource-card">
+                    <div class="resource-icon">💻</div>
+                    <h3>GitHub Repository</h3>
+                    <p>Source code, issues, and contribution guidelines</p>
+                    <span class="resource-link">github.com/huggingface/smolagents →</span>
+                </a>
+
+                <a href="https://huggingface.co/learn/agents-course" target="_blank" class="resource-card">
+                    <div class="resource-icon">🎓</div>
+                    <h3>HF Agents Course</h3>
+                    <p>Free comprehensive course on building AI agents</p>
+                    <span class="resource-link">huggingface.co/learn/agents-course →</span>
+                </a>
+
+                <a href="https://learn.deeplearning.ai/courses/building-code-agents-with-hugging-face-smolagents" target="_blank" class="resource-card">
+                    <div class="resource-icon">🎬</div>
+                    <h3>DeepLearning.AI Course</h3>
+                    <p>Video course by Andrew Ng and HuggingFace team</p>
+                    <span class="resource-link">deeplearning.ai →</span>
+                </a>
+
+                <a href="https://huggingface.co/blog/smolagents" target="_blank" class="resource-card">
+                    <div class="resource-icon">📝</div>
+                    <h3>Introduction Blog Post</h3>
+                    <p>Original announcement and design philosophy</p>
+                    <span class="resource-link">huggingface.co/blog/smolagents →</span>
+                </a>
+
+                <a href="https://huggingface.co/spaces" target="_blank" class="resource-card">
+                    <div class="resource-icon">🚀</div>
+                    <h3>HuggingFace Spaces</h3>
+                    <p>Deploy and share your agent applications</p>
+                    <span class="resource-link">huggingface.co/spaces →</span>
+                </a>
+            </div>
+
+            <div class="community-section">
+                <h3>Community & Support</h3>
+                <div class="community-links">
+                    <a href="https://huggingface.co/join/discord" target="_blank" class="community-link">
+                        <span class="community-icon">💬</span>
+                        <span>Discord Community</span>
+                    </a>
+                    <a href="https://discuss.huggingface.co/" target="_blank" class="community-link">
+                        <span class="community-icon">🗣️</span>
+                        <span>Discussion Forums</span>
+                    </a>
+                    <a href="https://twitter.com/huggingface" target="_blank" class="community-link">
+                        <span class="community-icon">🐦</span>
+                        <span>Twitter/X Updates</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🤖</span>
+                    <span class="logo-text">AgentLab</span>
+                    <p>Learn to build intelligent AI agents</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Learn</h4>
+                        <a href="#patterns">Patterns</a>
+                        <a href="#examples">Examples</a>
+                        <a href="#tutorials">Tutorials</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Resources</h4>
+                        <a href="https://huggingface.co/docs/smolagents" target="_blank">Documentation</a>
+                        <a href="https://github.com/huggingface/smolagents" target="_blank">GitHub</a>
+                        <a href="https://huggingface.co/learn/agents-course" target="_blank">Course</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Community</h4>
+                        <a href="https://huggingface.co/join/discord" target="_blank">Discord</a>
+                        <a href="https://discuss.huggingface.co/" target="_blank">Forums</a>
+                        <a href="https://twitter.com/huggingface" target="_blank">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built with care for the AI community. Powered by <a href="https://huggingface.co/docs/smolagents" target="_blank">smolagents</a>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
